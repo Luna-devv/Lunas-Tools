@@ -51,7 +51,7 @@ client.on(`ready`, () => {
 
 client.on(`messageCreate`, async (message) => {
     if (message.channel.id === `939281575554723880`) {
-        if ((!message.member.user.bot || !message.member.user.webhookId) && message.member.id != '821472922140803112') {
+        if ((!message.member?.user.bot || !message.webhookId) && message.member?.id != '821472922140803112') {
             message.member.ban({ reason: 'Wrote in disalowed channel' }).catch(() => null);
             message.delete().catch(() => null);
             return log(`App`, `Banned ${message.member.user.tag}`, `green`);
