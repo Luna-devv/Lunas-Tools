@@ -57,10 +57,11 @@ client.on(`messageCreate`, async (message) => {
             return log(`App`, `Banned ${message.member.user.tag}`, `green`);
         };
         if (!message.content && !message.embeds) return;
+        if (message.embeds[0]?.color == `#7289da`) message.embeds[0].color = `#cd4065`;
         client.channels.cache.get(`883824288300400682`).send({
-            content: message.content,
-            embeds: message.embeds
-        }).catch(() => null);
+            content: message.content ? message.content : null,
+            embeds: message.embeds ? message.embeds : null
+        })
     };
 });
 

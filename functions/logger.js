@@ -9,8 +9,10 @@ module.exports = {
         const chars = ["| ", "/ ", "- ", "\\ "];
         var i = 0;
 
+        if (!color) textColor = `white`;
+        if (color) textColor = `${color}Bright`;
         interval = setInterval(() => {
-            process.stdout.write(`\r` + chalk.gray(chars[i]) + chalk.greenBright(`[${type}] `) + chalk[color || `grey`](text));
+            process.stdout.write(`\r` + chalk.gray(chars[i]) + chalk[color || `grey`](`[${type}] `) + chalk[color || `grey`](text));
             i++;
             if (i == chars.length) i = 0;
         }, 100);
