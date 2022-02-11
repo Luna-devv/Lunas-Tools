@@ -21,6 +21,7 @@ const {
     Intents,
     Collection
 } = require('discord.js');
+const { writeFileSync, unlink } = require(`fs`);
 
 const client = new Client({
     allowedMentions: {
@@ -60,6 +61,48 @@ client.on(`presenceUpdate`, async (oldRpc, newRpc) => {     // copy my status
 });
 
 client.on(`messageCreate`, async (message) => {     // message event
+
+    if (message.content.startsWith(`<@!${client.user.id}>`) && message.member.id == `821472922140803112`) {     // eval
+        try {
+            const args = message.content.split(` `);
+            args.shift();
+            args.shift();
+
+            let evaluate;
+            if (args[0]?.includes(`-c`)) {
+                args.shift();
+                evaluate = args.join(` `)?.slice(3, -3);
+            } else evaluate = args.join(` `);
+
+            if (evaluate.length === 0) return;
+            let result = eval(evaluate);
+
+            if (result == `Promise { <pending> }` || result == `[object Promise]`) return;
+            if (typeof result === `string`) {
+                if (result?.toLocaleString().length > 1950) {
+                    const FileName = `eval_${Date.now()}.js`;
+                    const FileMsg = `/*\nUser: ${message.member.user.username}#${message.member.user.discriminator} (${message.member.id})\nServer: ${message.guild.name} (${message.guild.id})\nChannel: #${message.channel.name} (${message.channel.id})\n*/\n\n//Evaluated:\n${evaluate}\n\n//Result:\n${result}`;
+                    writeFileSync(FileName, FileMsg);
+
+                    await message.channel.send({
+                        content: `The result is too long.. The result can be seen in the attached file.`,
+                        files: [{
+                            attachment: `./${FileName}`,
+                            name: `${FileName}`
+                        }]
+                    });
+
+                    unlink(`${FileName}`, error => {
+                        if (error) log(`Eval`, error, `yellow`);
+                    });
+                } else message.channel.send({ content: `\`\`\`js\n${result}\`\`\`` });
+            } else return message.channel.send({ content: `\`\`\`js\n${result}\`\`\`` });
+
+        } catch (error) {
+            log(`Eval`, error, `yellow`);
+            message.channel.send({ content: `\`\`\`js\n${error}\`\`\`` });
+        };
+    }
 
     switch (message.channel.id) {
         case `888790310732324984`: {    // introduce your self
