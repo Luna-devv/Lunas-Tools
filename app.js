@@ -10,19 +10,10 @@
  * 
  */
 
-const {
-    start,
-    log,
-    end
-} = require(`./functions/logger`);
+const { start, log } = require(`./functions/logger`);
 start(`App`, `Connecting to WebSocket..`, `blue`)
-const {
-    Client,
-    Intents,
-    Collection
-} = require('discord.js');
-const { writeFileSync, unlink } = require(`fs`);
 
+const { Client, Intents } = require('discord.js');
 const client = new Client({
     allowedMentions: {
         parse: [`users`, `roles`]
@@ -41,50 +32,78 @@ const client = new Client({
     ]
 });
 
+
+// -------------------------- Import config
+
 const config = require(`./config.js`);
 Object.keys(config).forEach(async (key) => {
     client[key] = config[key];
 });
 
-let lastStatus;
-client.on(`ready`, async () => {
-    const user = await client.users.fetch(`821472922140803112`);
-    client.user.setPresence({ status: user?.status });
-    lastStatus = user?.status;
 
-    end(`App`, `Connected as ${client.user.tag}`, `blue`);
+// -------------------------- Handlers
+
+const names = ['events']
+names.forEach(name => {
+    require(`./handlers/${name}`)(client);
 });
 
-client.on(`presenceUpdate`, async (oldRpc, newRpc) => {     // copy my status
-    if (newRpc?.userId != `821472922140803112`) return;
-    if (newRpc?.status != lastStatus) client.user.setPresence({ status: newRpc?.status, activities: [{ name: `at waya.one`, type: `WATCHING`, }] });
-});
-
-client.on(`messageCreate`, async (message) => {     // message event
-
-    switch (message.channel.id) {
-        case `888790310732324984`: {    // introduce your self
-            if (message.guild.id !== client.server_id) return;
-            if (!message.guild.me.permissions.has(`MANAGE_CHANNELS`)) return;
-            message.channel.permissionOverwrites.edit(message.member.user.id, { SEND_MESSAGES: false });
-            break;
-        };
-        case `939281575554723880`: {    // send into linked channel
-            if (!message.member?.user.bot && !message.webhookId && (message.member?.id != '821472922140803112')) {
-                message.member.ban({ reason: 'Wrote in disalowed channel' }).catch(() => null);
-                message.delete().catch(() => null);
-                return log(`App`, `Banned ${message.member.user.tag}`, `green`);
-            };
-            if (!message.content && !message.embeds) return;
-            if (((message.embeds[0]?.color == `#7289da`) || !message.embeds[0]?.color) && message.embeds[0]) message.embeds[0].color = `#cd4065`;
-            client.channels.cache.get(`883824288300400682`).send({
-                content: message.content ? message.content : null,
-                embeds: message.embeds ? message.embeds : null
-            });
-            break;
-        };
-    };
-
-});
-
+module.exports = client;
 client.login(client.token);
+
+
+// -------------------------- Web server
+
+const { readdirSync, statSync } = require(`fs`);
+const express = require(`express`);
+const path = require(`path`);
+const app = express();
+
+app.use(express.json());
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, authorization ');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
+
+app.get(`*`, (req, res, next) => {
+    if (!client.user) return res.status(500).send({
+        status: 500,
+        message: `The client is not available`
+    });
+    next();
+});
+
+walk(path.join(__dirname, 'api')).forEach(file => {
+    const relativePath = file.replace(path.join(__dirname, 'routes'), '');
+    const routePath = relativePath.split('\\').join("/").replace(".js", '');
+    const routes = require(file);
+    routes.forEach(route => {
+        if (route.method) app[route.method](route.path ? route.path : routePath, route.run);
+    });
+});
+
+function walk(dir) {
+    const results = [];
+    readdirSync(dir).forEach(dirItem => {
+        const stat = statSync(path.join(dir, dirItem));
+        if (stat.isFile()) return results.push(path.join(dir, dirItem));
+        else if (stat.isDirectory()) walk(path.join(dir, dirItem)).forEach(walkItem => results.push(walkItem));
+    });
+    return results;
+};
+
+app.get(`*`, (req, res) => {
+    res.status(404).json({
+        status: 404,
+        message: `This end-point does not exist.`,
+    });
+});
+
+
+app.listen(client.server.port, (error) => {
+    if (error) log(`API`, JSON.stringify(error), `red`);
+    log(`API`, `Listening to http://localhost:${client.server.port}`, `green`);
+});
