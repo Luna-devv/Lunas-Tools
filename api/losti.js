@@ -35,34 +35,55 @@ module.exports = [{
         let status = { state: { text: losti.presence?.status, color: color }, emote: emote, text: text };
 
         let activities = [];
-        if (losti.presence?.activities.filter(activitie => activitie.type === `PLAYING`)) {
-            acts = await losti.presence?.activities.filter(activitie => activitie.type === `PLAYING`);
-            acts?.forEach((activitie) => {
-                if (activitie.name !== `ShareX`)
-                    activities.push({
-                        applicationId: activitie.applicationId,
-                        name: activitie.name,
-                        url: activitie.url,
-                        details: activitie.details,
-                        state: activitie.state,
-                        createdTimestamp: activitie.createdTimestamp,
-                        timestamps: {
-                            start: activitie.timestamps?.start ? new Date(activitie.timestamps?.start).getTime() : null,
-                            end: activitie.timestamps?.end ? new Date(activitie.timestamps?.end).getTime() : null
+        losti.presence?.activities?.forEach((activitie) => {
+            if (activitie.name == `Spotify`) {
+                activities.push({
+                    applicationId: activitie.applicationId,
+                    name: activitie.name,
+                    url: activitie.url,
+                    details: activitie.details,
+                    state: activitie.state,
+                    createdTimestamp: activitie.createdTimestamp,
+                    timestamps: {
+                        start: activitie.timestamps?.start ? new Date(activitie.timestamps?.start).getTime() : null,
+                        end: activitie.timestamps?.end ? new Date(activitie.timestamps?.end).getTime() : null
+                    },
+                    assets: {
+                        large: {
+                            text: activitie.assets?.largeText,
+                            image: (activitie.assets?.largeImage ? (activitie.assets.largeImage.startsWith(`spotify:`) ? `https://i.scdn.co/image/${activitie.assets.largeImage.replace(/spotify:/, ``)}` : `https://i.scdn.co/image/${activitie.assets.largeImage}.png`) : null)
                         },
-                        assets: {
-                            large: {
-                                text: activitie.assets?.largeText,
-                                image: activitie.assets?.largeImage ? (activitie.assets.largeImage.startsWith(`mp:external`) ? `https://media.discordapp.net/${activitie.assets.largeImage.replace(/mp:/, ``)}` : `https://cdn.discordapp.com/app-assets/${activitie.applicationId}/${activitie.assets.largeImage}.png`) : null
-                            },
-                            small: {
-                                text: activitie.assets?.smallText,
-                                image: activitie.assets?.smallImage ? `https://cdn.discordapp.com/app-assets/${activitie.applicationId}/${activitie.assets.smallImage}.png` : null
-                            }
+                        small: {
+                            text: activitie.assets?.smallText,
+                            image: activitie.assets?.smallImage ? `https://cdn.discordapp.com/app-assets/${activitie.applicationId}/${activitie.assets.smallImage}.png` : "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1200px-Spotify_logo_without_text.svg.png"
                         }
-                    });
-            });
-        };
+                    }
+                });
+            } else if (activitie.name != `Custom Status`) {
+                activities.push({
+                    applicationId: activitie.applicationId,
+                    name: activitie.name,
+                    url: activitie.url,
+                    details: activitie.details,
+                    state: activitie.state,
+                    createdTimestamp: activitie.createdTimestamp,
+                    timestamps: {
+                        start: activitie.timestamps?.start ? new Date(activitie.timestamps?.start).getTime() : null,
+                        end: activitie.timestamps?.end ? new Date(activitie.timestamps?.end).getTime() : null
+                    },
+                    assets: {
+                        large: {
+                            text: activitie.assets?.largeText,
+                            image: (activitie.assets?.largeImage ? (activitie.assets.largeImage.startsWith(`mp:external`) ? `https://media.discordapp.net/${activitie.assets.largeImage.replace(/mp:/, ``)}` : `https://cdn.discordapp.com/app-assets/${activitie.applicationId}/${activitie.assets.largeImage}.png`) : null)
+                        },
+                        small: {
+                            text: activitie.assets?.smallText,
+                            image: activitie.assets?.smallImage ? (activitie.assets.smallImage.startsWith(`mp:external`) ? `https://media.discordapp.net/${activitie.assets.smallImage.replace(/mp:/, ``)}` : `https://cdn.discordapp.com/app-assets/${activitie.applicationId}/${activitie.assets.smallImage}.png`) : null
+                        }
+                    }
+                });
+            }
+        });
 
         return res.status(200).json({
             status: 200,

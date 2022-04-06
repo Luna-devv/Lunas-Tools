@@ -57,7 +57,7 @@ module.exports = [{
                             },
                             small: {
                                 text: activitie.assets?.smallText,
-                                image: activitie.assets?.smallImage ? `https://cdn.discordapp.com/app-assets/${activitie.applicationId}/${activitie.assets.smallImage}.png` : null
+                                image: activitie.assets?.smallImage ? (activitie.assets.smallImage.startsWith(`mp:external`) ? `https://media.discordapp.net/${activitie.assets.smallImage.replace(/mp:/, ``)}` : `https://cdn.discordapp.com/app-assets/${activitie.applicationId}/${activitie.assets.smallImage}.png`) : null
                             }
                         }
                     });
