@@ -4,7 +4,7 @@ module.exports = {
 
         interaction.reply({
             epemeral: true,
-            content: `Lol? YOu think this really works xd`,
+            content: `Lol? You think this really works xD`,
             components: [
                 {
                     type: 1,
@@ -13,7 +13,7 @@ module.exports = {
                             type: 2,
                             label: `Waya Bot`,
                             style: 5,
-                            url: `https://waya.one`
+                            url: `https://waya.one/`
                         }
                     ]
                 }
