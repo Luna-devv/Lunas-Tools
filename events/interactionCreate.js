@@ -4,7 +4,7 @@ module.exports = {
 
         interaction.reply({
             epemeral: true,
-            content: `Lol? You think this really works xD`,
+            content: `Lol? You think this really works xd`,
             components: [
                 {
                     type: 1,
