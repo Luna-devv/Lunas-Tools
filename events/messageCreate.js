@@ -1,3 +1,5 @@
+const { log } = require(`../functions/logger`);
+
 module.exports = {
     name: 'messageCreate',
     run: async (message) => {
@@ -17,7 +19,9 @@ module.exports = {
                     return log(`App`, `Banned ${message.member.user.tag}`, `green`);
                 };
                 if (!message.content && !message.embeds) return;
+
                 if (((message.embeds[0]?.color == `#7289da`) || !message.embeds[0]?.color) && message.embeds[0]) message.embeds[0].color = `#cd4065`;
+
                 client.channels.cache.get(`883824288300400682`).send({
                     content: message.content ? message.content : null,
                     embeds: message.embeds ? message.embeds : null
@@ -28,21 +32,18 @@ module.exports = {
                 if (!message.member?.user.bot && !message.webhookId && (message.member?.id != '797012765352001557' && message.member?.id != '821472922140803112')) {
                     message.member.ban({ reason: 'Wrote in disalowed channel' }).catch(() => null);
                     message.delete().catch(() => null);
-                    return log(`App`, `Beanned ${message.member.user.tag}`, `green`);
+                    return log(`App`, `Banned ${message.member.user.tag}`, `green`);
                 };
                 if (!message.content && !message.embeds) return;
+
                 if (message.embeds[0]) {
                     message.embeds[0].color = `#7289da`; message.embeds[0]?.author?.name?.replace('Crni39', 'The Digital');
                     message.embeds[0].description = '> ' + message.embeds[0]?.description?.split('- Crni39\n').join('\n> ').slice(0, -2);
                 };
 
-                await require('axios')({
-                    url: client.webhook,
-                    method: 'POST',
-                    data: {
-                        content: message.content ? message.content : null,
-                        embeds: message.embeds ? message.embeds : null
-                    }
+                client.channels.cache.get(`956604381300654101`).send({
+                    content: message.content ? message.content : null,
+                    embeds: message.embeds ? message.embeds : null
                 });
                 break;
             };
