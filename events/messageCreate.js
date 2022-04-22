@@ -37,7 +37,8 @@ module.exports = {
                 if (!message.content && !message.embeds) return;
 
                 if (message.embeds[0]) {
-                    message.embeds[0].color = `#7289da`; message.embeds[0]?.author.name = 'The Digital';
+                    message.embeds[0].color = `#7289da`;
+                    message.embeds[0].author.name = 'The Digital';
                     message.embeds[0].description = '> ' + message.embeds[0]?.description?.split('- Crni39\n').join('\n> ').slice(0, -9);
                 };
 
