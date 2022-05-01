@@ -12,7 +12,7 @@ module.exports = [{
     run: async (req, res) => {
 
         const forcelosti = await client.users.fetch(`421991668556759042`, { force: true });
-        const losti = await (await client.guilds.cache.get(`828676951023550495`))?.members.fetch(`421991668556759042`);
+        const losti = await (await client.guilds.cache.get(`810248284861366332`))?.members.fetch(`421991668556759042`);
 
         if (!losti?.user?.id || !forcelosti?.id) return res.status(500).json({
             status: 500,
