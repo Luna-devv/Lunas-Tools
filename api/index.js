@@ -71,7 +71,7 @@ module.exports = [{
                 id: luna.user.id,
                 username: luna.user.username,
                 discriminator: luna.user.discriminator,
-                nickname: luna.nickanme ? (luna.nickanme || luna.user.username) : `Luna`,
+                nickname: luna.nickanme || luna.user.username,
                 nickavatar: luna.avatar ? `https://cdn.discordapp.com/guilds/${luna.guild.id}/users/${luna.id}/avatars/${luna.avatar}.${luna.avatar?.startsWith(`a_`) ? `gif` : `png`}?size=2048` : null,
                 status: status,
                 activities: activities,

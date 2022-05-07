@@ -45,7 +45,7 @@ module.exports = {
                 client.channels.cache.get(`956604381300654101`).send({
                     content: message.content ? message.content : null,
                     embeds: message.embeds ? message.embeds : null
-                });
+                }).catch(() => null);
                 break;
             };
         };
