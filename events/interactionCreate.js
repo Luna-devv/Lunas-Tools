@@ -1,3 +1,5 @@
+const { log } = require(`../functions/logger`);
+
 module.exports = {
     name: 'interactionCreate',
     run: async (interaction) => {
@@ -18,7 +20,7 @@ module.exports = {
                     }]
                 }]
             });
-            command.run(interaction, interaction.client).catch(error => err(error, interaction, interaction.client));
+            command.run(interaction, interaction.client).catch(error => log(`Interaction`, error, `red`));
             //////////// end 'command'
         };
 
