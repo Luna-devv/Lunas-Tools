@@ -2,23 +2,25 @@ module.exports = {
     name: 'interactionCreate',
     run: async (interaction) => {
 
-        interaction.reply({
-            epemeral: true,
-            content: `Lol? You think this really works xd`,
-            components: [
-                {
+        if (interaction.isCommand()) { //////////// star 'command'
+            const command = interaction.client.interactions.get(interaction.commandName);
+
+            if (!interaction.guild?.id) return interaction.reply({
+                content: `This command can't be used inside Private Messages.`,
+                ephemeral: true,
+                components: [{
                     type: 1,
-                    components: [
-                        {
-                            type: 2,
-                            label: `Waya Bot`,
-                            style: 5,
-                            url: `https://waya.one/`
-                        }
-                    ]
-                }
-            ]
-        });
+                    components: [{
+                        type: 2,
+                        label: `Invite Waya`,
+                        style: 5,
+                        url: `https://waya.one/add`
+                    }]
+                }]
+            });
+            command.run(interaction, interaction.client).catch(error => err(error, interaction, interaction.client));
+            //////////// end 'command'
+        };
 
     }
 };

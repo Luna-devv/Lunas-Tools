@@ -13,7 +13,7 @@
 const { start, log } = require(`./functions/logger`);
 start(`App`, `Connecting to WebSocket..`, `blue`)
 
-const { Client, Intents } = require('discord.js');
+const { Client, Intents, Collection } = require('discord.js');
 const client = new Client({
     allowedMentions: {
         parse: [`users`, `roles`]
@@ -45,7 +45,8 @@ Object.keys(config).forEach(async (key) => {
 
 // -------------------------- Handlers
 
-const names = ['events']
+client.interactions = new Collection();
+const names = ['interactions', 'events']
 names.forEach(name => {
     require(`./handlers/${name}`)(client);
 });
