@@ -1,4 +1,4 @@
-const { end } = require(`../functions/logger`);
+const { log, end } = require(`../functions/logger`);
 
 module.exports = {
     name: 'ready',
@@ -14,5 +14,10 @@ module.exports = {
         client.lastStatus = user?.status;
         end(`App`, `Connected as ${client.user.tag}`, `blue`);
 
+        // start twitter
+        client.twitter.users.forEach((user) => {
+            client.twitterClient.follow(user.id);
+            log(`Twitter`, `Started Following @${user.name}`, `cyan`);
+        });
     }
 };

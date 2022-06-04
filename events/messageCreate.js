@@ -51,8 +51,9 @@ module.exports = {
             };
             case `922927861248167967`: {
                 message.channel.send(`<@!821472922140803112>`).then(m => m.delete());
-            }
+            };
         };
+        
 
     }
 };
