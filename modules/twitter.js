@@ -69,6 +69,7 @@ module.exports = async (client) => {
 };
 
 async function formatDesc(client, text) {
+    if (!text) return '';
     let desc = ``;
     let rows = text?.split('\n');
 
@@ -98,7 +99,7 @@ async function formatDesc(client, text) {
         await client.wait(2000 * 5);
         desc += (`> ` + (array?.length <= 1 ? array?.[0] : array?.join(' ')) + `\n`);
     });
-    
+
     await client.wait(2200 * (((text?.split('\n')?.length + text?.split(' ')?.length) < 4 ? 5 : (text?.split('\n')?.length + text?.split(' ')?.length))) + 2200); // this will delay a loot sometimes, also idc
     return (desc != 0 ? desc : null);
 };
