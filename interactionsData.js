@@ -16,24 +16,24 @@ module.exports = [
                 required: true,
                 choices: [
                     {
-                        name: `guilds`,
-                        value: `servers`
+                        name: `Rank`,
+                        value: `rank`
                     },
                     {
-                        name: `votes`,
+                        name: `Votes`,
                         value: `monthlyVotes`
                     },
                     {
-                        name: `total votes`,
-                        value: `totalVotes`
-                    },
-                    {
-                        name: `shards`,
+                        name: `Shards`,
                         value: `shardCount`
                     },
                     {
-                        name: `rank`,
-                        value: `rank`
+                        name: `Guilds`,
+                        value: `servers`
+                    },
+                    {
+                        name: `Total Votes`,
+                        value: `totalVotes`
                     }
                 ]
             }

@@ -42,6 +42,11 @@ Object.keys(config).forEach(async (key) => {
     client[key] = config[key];
 });
 
+// -------------------------- Wait
+
+client.wait = (time) => {
+    return new Promise(smth => setTimeout(smth, time));
+};
 
 // -------------------------- Handlers
 
@@ -53,6 +58,7 @@ names.forEach(name => {
 
 module.exports = client;
 client.login(client.token);
+require('./modules/twitter')(client); // by The Digital :kek:
 
 
 // -------------------------- Web server

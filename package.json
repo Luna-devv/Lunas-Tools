@@ -12,6 +12,7 @@
     "axios": "^0.26.1",
     "chalk": "^4.1.2",
     "discord.js": "^13.6.0",
-    "express": "^4.17.3"
+    "express": "^4.17.3",
+    "node-tweet-stream": "^2.1.0"
   }
 }
