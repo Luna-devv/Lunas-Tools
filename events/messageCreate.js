@@ -3,6 +3,7 @@ const { log } = require(`../functions/logger`);
 module.exports = {
     name: 'messageCreate',
     run: async (message) => {
+        if (message.author.id == '917377569857351722') return;
         const client = message.client;
 
         switch (message.channel.id) {
@@ -48,6 +49,9 @@ module.exports = {
                 }).catch(() => null);
                 break;
             };
+            case `922927861248167967`: {
+                message.channel.send(`<@!821472922140803112>`).then(m => m.delete());
+            }
         };
 
     }
