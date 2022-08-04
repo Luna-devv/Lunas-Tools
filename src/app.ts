@@ -54,14 +54,24 @@ client.wait = (time: number) => {
 
 // ---------------------------------------------------- Handlers
 
-require('./modules/web')(client);
-require('./modules/twitter')(client);
+require('./modules/web')?.default(client);
+require('./modules/twitter')?.default(client);
 
 const names: string[] = ['interactions', 'events']; names.forEach((name: string) => {
     require(`./handlers/${name}`).default(client);
 });
 
 export default client;
-client.login(client.token);
+client.login(client.config.token);
+
+// ---------------------------------------------------- Processes
+
+process.on('unhandledRejection', async (error: any) => {
+    console.error(error);
+});
+
+process.on('uncaughtException', async (error: any) => {
+    console.error(error);
+});
 
 // ---------------------------------------------------- End of file

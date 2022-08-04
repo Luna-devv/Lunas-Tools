@@ -4,7 +4,7 @@ import Logger from '../functions/logger';
 export default {
     name: 'messageCreate',
     run: async (message: any, client: any) => {
-        if (message.author.id == client.user.id) return;
+        if (message?.author?.id == client.user.id) return;
 
         switch (message.channel.id) {
             case `888790310732324984`: {    // introduce your self

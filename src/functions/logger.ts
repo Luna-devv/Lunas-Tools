@@ -23,7 +23,7 @@ const Module = {
         if (!text) throw new TypeError(`'Text' is undefined`);
         
         let first: any = chalk[color || 'grey'];
-        let second: any = `${chalk[color || 'white']}Bright`;
+        let second: any = chalk[(color + `Bright`) || 'white'];
 
         clearInterval(interval); console.clear();
         console.log(first(`[${type}] `) + second(text));
@@ -34,7 +34,7 @@ const Module = {
         if (!text) throw new TypeError(`'Text' is undefined`);
         
         let first: any = chalk[color || 'grey'];
-        let second: any = `${chalk[color || 'white']}Bright`;
+        let second: any = chalk[(color + `Bright`) || 'white'];
         
         console.log(first(`[${type}] `) + second(text));
     },

@@ -1,12 +1,13 @@
-import { EventType } from '../json/typings';
-import { readdirSync } from'fs';
+import path from 'path';
+import fs from 'fs';
 
-export default (client: any) => {
-    const eventFiles: string[] = readdirSync('./events').filter((file: string) => file.endsWith('.js'));
+export default function (client: any) {
+    const eventFiles = fs.readdirSync(path.join(__dirname, `..`, `events`)).filter((file: any) => file.endsWith(".js"));
 
     for (const file of eventFiles) {
-        const event: EventType = require(`../events/${file}`);
-        const argumentsFunction = (...args: any[]) => event.run(...args);
+        const event = require(path.join(__dirname, `..`, `events`, file)).default;
+        
+        const argumentsFunction = (...args: any) => event.run(client, ...args);
         event.once ? client.once(event.name, argumentsFunction) : client.on(event.name, argumentsFunction);
     };
 };

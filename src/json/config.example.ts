@@ -11,8 +11,8 @@ export default {
             name: '',
         }],
         channels: [''],
-        twitterConsumerKey: '',
-        twitterConsumerSecret: '',
+        twitterApiKey: '',
+        twitterApiSecret: '',
         twitterAccessTokenKey: '',
         twitterAccessTokenSecret: ''
     }

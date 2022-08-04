@@ -1,12 +1,11 @@
 {
   "name": "lunas-tools",
-  "version": "1.0.0",
-  "description": "",
+  "version": "2.0.0",
   "main": "app.js",
   "scripts": {
     "ts": "npm install tsc typescript --save-dev -g",
     "init": "npm install && npm run build && npm run start",
-    "start": "cd dist && node index --no-warning",
+    "start": "cd dist && node app --no-warning",
     "build": "tsc --build",
     "watch": "tsc --watch"
   },

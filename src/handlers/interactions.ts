@@ -1,14 +1,10 @@
 import { CommandType } from '../json/typings';
-import { readdirSync } from 'fs';
+import path from 'path';
+import fs from 'fs';
 
 export default (client: any) => {
-    const commands: string[] = readdirSync('./interactions/').filter((file: string) => file.endsWith('.js'));
-
-    for (let file of commands) {
-        let pull: CommandType = require(`../interactions/${file}`);
-
-        if (pull.name) {
-            client?.interactions?.set(pull.name, pull);
-        };
-    };
+    fs.readdirSync(path.join(__dirname, `..`, `interactions`)).filter((file: any) => file.endsWith(`.js`)).map((cmd: any) => {
+        let pull: CommandType = require(path.join(__dirname, `..`, `interactions`, cmd)).default;
+        client?.interactions?.set(pull.name, pull);
+    });
 };

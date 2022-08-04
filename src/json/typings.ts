@@ -11,8 +11,8 @@ export type Config = {
             name: string;
         }[];
         channels: string[];
-        twitterConsumerKey: string;
-        twitterConsumerSecret: string;
+        twitterApiKey: string;
+        twitterApiSecret: string;
         twitterAccessTokenKey: string;
         twitterAccessTokenSecret: string;
     }
