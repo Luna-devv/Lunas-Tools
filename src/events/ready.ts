@@ -1,23 +1,25 @@
-const { log, end } = require(`../functions/logger`);
+import Logger from '../functions/logger';
 
-module.exports = {
+export default {
     name: 'ready',
     once: true,
-    run: async (client) => {
+    run: async (client: any) => {
 
-        await ['828676951023550495', '810248284861366332'].forEach((guild) => client.guilds.cache.get(guild)?.commands.set([]).catch(() => null)); // test guilds
-        await client.application.commands.set(require('../interactionsData.js')); // all guilds
+        ['828676951023550495', '810248284861366332'].forEach((guild) => client.guilds.cache.get(guild)?.commands.set([]).catch(() => null)); // test guilds
+        await client?.application?.commands?.set(require('../interactionsData.js').default); // all guilds
 
-        // copy my user status
-        const user = await client.users.fetch(`821472922140803112`);
-        client.user.setPresence({ status: user?.status });
+        // copy Luna's user status
+        const user: any = client.guilds.cache.get('810248284861366332')?.presences?.cache?.get('821472922140803112');
+
+        client?.user?.setPresence({ status: user?.status });
         client.lastStatus = user?.status;
-        end(`App`, `Connected as ${client.user.tag}`, `blue`);
+        
+        Logger.end(`App`, `Connected as ${client?.user?.tag}`, `blue`);
 
-        // start twitter
-        client.twitter.users.forEach((user) => {
-            client.twitterClient.follow(user.id);
-            log(`Twitter`, `Started Following @${user.name}`, `cyan`);
+        // start twitter client
+        client?.twitter?.users?.forEach((user: { id: string, name: string }) => {
+            client.twitterClient.follow(user?.id);
+            Logger.log(`Twitter`, `Started Following @${user.name}`, `cyan`);
         });
     }
 };

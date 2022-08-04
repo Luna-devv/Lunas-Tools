@@ -1,11 +1,13 @@
-const { log } = require(`../functions/logger`);
+import { CommandType } from '../json/typings';
+import Logger from '../functions/logger';
+import Discord from 'discord.js';
 
-module.exports = {
+export default {
     name: 'interactionCreate',
-    run: async (interaction) => {
+    run: async (interaction: any, client: any) => {
 
-        if (interaction.isCommand()) { //////////// star 'command'
-            const command = interaction.client.interactions.get(interaction.commandName);
+        if (interaction.type == Discord.InteractionType.ApplicationCommand) {
+            const command: CommandType = client.interactions.get(interaction.commandName);
 
             if (!interaction.guild?.id) return interaction.reply({
                 content: `This command can't be used inside Private Messages.`,
@@ -20,9 +22,8 @@ module.exports = {
                     }]
                 }]
             });
-            command.run(interaction, interaction.client).catch(error => log(`Interaction`, error, `red`));
-            //////////// end 'command'
-        };
 
+            await command.run(interaction, client).catch((error: any) => Logger.log(`Interaction`, error, `red`));
+        };
     }
 };

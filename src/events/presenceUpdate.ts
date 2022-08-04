@@ -1,18 +1,19 @@
-module.exports = {
-    name: 'presenceUpdate',
-    run: async (oldRpc, newRpc) => {
-        const client = newRpc.client;
+import { Presence } from 'discord.js';
 
-        // copy my user status
+export default {
+    name: 'presenceUpdate',
+    run: async (oldRpc: Presence, newRpc: Presence, client: any) => {
+
+        // copy Luna's user status
         if (newRpc?.userId != `821472922140803112`) return;
-        if (newRpc?.status != client.lastStatus)
-            client.user.setPresence({
+        if (newRpc?.status != client?.lastStatus) {
+            client?.user?.setPresence({
                 status: newRpc?.status,
                 activities: [{
                     name: `at waya.one`,
                     type: `WATCHING`,
                 }]
-            });
-
+            } as any);
+        };
     }
 };
