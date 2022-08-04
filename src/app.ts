@@ -15,7 +15,7 @@
 
 import Discord from 'discord.js';
 import config from './json/config';
-import Logger from './functions/logger';
+import Logger from './modules/logger';
 
 // ---------------------------------------------------- Discord
 
@@ -43,7 +43,7 @@ const client: any = new Discord.Client({
 });
 
 
-// ---------------------------------------------------- Exports & Functions
+// ---------------------------------------------------- Exports & modules
 
 client.config = config; client.logger = Logger;
 client.interactions = new Discord.Collection();

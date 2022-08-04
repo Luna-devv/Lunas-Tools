@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import Logger from '../functions/logger';
+import Logger from '../modules/logger';
 
 export default {
     name: 'messageCreate',

@@ -1,4 +1,4 @@
-import Logger from '../functions/logger';
+import Logger from '../modules/logger';
 import express from 'express';
 import path from 'path';
 import fs from 'fs';

@@ -1,4 +1,4 @@
-import Logger from '../functions/logger';
+import Logger from '../modules/logger';
 
 export default {
     name: 'ready',

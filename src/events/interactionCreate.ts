@@ -1,5 +1,5 @@
 import { CommandType } from '../json/typings';
-import Logger from '../functions/logger';
+import Logger from '../modules/logger';
 import Discord from 'discord.js';
 
 export default {

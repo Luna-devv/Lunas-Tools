@@ -1,5 +1,5 @@
 import { ButtonObject } from '../json/typings';
-import Logger from '../functions/logger';
+import Logger from './logger';
 import Twit from 'node-tweet-stream';
 
 export default async (client: any) => {
@@ -13,7 +13,7 @@ export default async (client: any) => {
     twitterClient.on('tweet', async (tweet: any) => {
         if (tweet?.in_reply_to_screen_name) return;
 
-        client?.config?.twitter?.users?.forEach(async (user: { id: string, name: string }) => {
+        for await (let user of client?.config?.twitter?.users) {
             if (tweet.user.id == user.id && tweet.user.screen_name == user.name) {
 
                 let buttons: ButtonObject[] = [{
@@ -68,7 +68,7 @@ export default async (client: any) => {
                     };
                 });
             };
-        });
+        };
     });
 
     client.twitterClient = twitterClient;
