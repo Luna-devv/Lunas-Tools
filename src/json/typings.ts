@@ -39,4 +39,24 @@ export type CustomActivityType = {
             image: string | null;
         }
     };
-}
+};
+
+export type ButtonObject = {
+    type: 2;
+    style: 1 | 2 | 3 | 4 | 5;
+    label: string;
+    emoji: string;
+    url?: string;
+    custom_id?: string;
+};
+
+export type CommandType = {
+    name: string;
+    run: (interaction: any, client: any) => Promise<void>;
+};
+
+export type EventType = {
+    name: string;
+    once?: boolean;
+    run: (...args: any[]) => Promise<void>;
+};
