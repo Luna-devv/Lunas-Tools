@@ -7,8 +7,8 @@ export default {
     },
     twitter: {
         users: [{
-            id: '1376526278182993925',
-            name: 'Luni_sia',
+            id: '',
+            name: '',
         }],
         channels: [''],
         twitterConsumerKey: '',

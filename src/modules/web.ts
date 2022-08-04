@@ -1,16 +1,17 @@
 // ---------------------------------------------------- Imports
 
-import express, { Request, Response, NextFunction } from 'express';
-import { Application } from 'express';
+import Logger from '../functions/logger';
+import express from 'express';
 import client from '../app';
+import path from 'path';
 import fs from 'fs';
 
 // ---------------------------------------------------- Initialization
 
-const app: Application = express();
+const app: any = express();
 
 app.use(express.json());
-app.use((req: Request, res: Response, next: NextFunction) => {
+app.use((req: any, res: any, next: any) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, authorization ');
@@ -18,7 +19,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     next();
 });
 
-app.get(`*`, (req: Request, res: Response, next: NextFunction) => {
+app.get(`*`, (req: any, res: any, next: any) => {
     if (!client.user) return res.status(500).send({
         status: 500,
         message: `The client is not available`
@@ -29,7 +30,6 @@ app.get(`*`, (req: Request, res: Response, next: NextFunction) => {
 
 // ---------------------------------------------------- Routes
 
-const path = require('path');
 walk(path.join(__dirname, 'api')).forEach((file: string) => {
     const relativePath = file.replace(path.join(__dirname, 'api'), '');
     const routePath = relativePath.split('\\').join("/").replace(".js", '');
@@ -57,7 +57,7 @@ function walk(dir: string) {
 
 // ---------------------------------------------------- Errors
 
-app.get(`*`, (req: Request, res: Response) => {
+app.get(`*`, (req: any, res: any, next: any) => {
     return res.status(404).json({
         status: 404,
         message: `This end-point does not exist.`,
@@ -67,9 +67,9 @@ app.get(`*`, (req: Request, res: Response) => {
 // ---------------------------------------------------- Start
 
 app.listen(client?.config?.server?.port, () => {
-    log(`API`, `Listening to http://localhost:${client?.config?.server?.port}`, `green`);
+    Logger.log(`API`, `Listening to http://localhost:${client?.config?.server?.port}`, `green`);
 }).on('error', (error: Error) => {
-    log(`API`, JSON.stringify(error), `red`);
+    Logger.log(`API`, JSON.stringify(error), `red`);
 });
 
 // ---------------------------------------------------- End of File

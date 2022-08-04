@@ -1,21 +1,22 @@
-const { start, log } = require(`../functions/logger`);
+import { ButtonObject } from '../json/typings';
+import Logger from '../functions/logger';
 import Twit from 'node-tweet-stream';
 
-module.exports = async (client: any) => {
+export default async (client: any) => {
     const twitterClient: any = new Twit({
-        consumer_key: client.twitter.twitterConsumerKey,
-        consumer_secret: client.twitter.twitterConsumerSecret,
-        token: client.twitter.twitterAccessTokenKey,
-        token_secret: client.twitter.twitterAccessTokenSecret
+        consumer_key: client?.config?.twitter?.twitterConsumerKey,
+        consumer_secret: client?.config?.twitter?.twitterConsumerSecret,
+        token: client?.config?.twitter?.twitterAccessTokenKey,
+        token_secret: client?.config?.twitter?.twitterAccessTokenSecret
     });
 
-    twitterClient.on('tweet', async function (tweet) {
+    twitterClient.on('tweet', async (tweet: any) => {
         if (tweet?.in_reply_to_screen_name) return;
 
-        client.twitter.users.forEach(async (user) => {
+        client?.config?.twitter?.users?.forEach(async (user: { id: string, name: string }) => {
             if (tweet.user.id == user.id && tweet.user.screen_name == user.name) {
 
-                let buttons = [{
+                let buttons: ButtonObject[] = [{
                     type: 2,
                     style: 5,
                     label: `Tweet`,
@@ -35,10 +36,11 @@ module.exports = async (client: any) => {
                     tweet.entities.media = tweet?.quoted_status?.entities?.media
                 };
 
-                let desc = await formatDesc(client, tweet?.text); // don't blame me lmao
+                let desc: (string | null) = await formatDesc(client, tweet?.text); // don't blame me lmao
 
-                client.twitter.channels.forEach((channel) => {
-                    client.channels.cache.get(channel)?.send({
+                client?.config?.twitter?.channels?.forEach((id: any) => {
+                    let channel: any = client?.channels?.cache?.get(id); // just no, ffs
+                    channel?.send({
                         content: `<@&953992722254012446> a new ${tweet?.is_quote_status ? `retweet` : `tweet`} has been published <a:Nod:952226993921998859>`,
                         embeds: [{
                             author: {
@@ -59,7 +61,7 @@ module.exports = async (client: any) => {
                             type: 1,
                             components: buttons
                         }]
-                    }).then((msg) => log(`Tweet`, `Sent to #${msg.channel.name}.`, `yellow`)).catch(() => null);
+                    }).then(() => Logger.log(`Tweet`, `Sent to #${channel?.name}.`, `yellow`)).catch(() => null);
                 });
             };
         });
@@ -68,37 +70,40 @@ module.exports = async (client: any) => {
     client.twitterClient = twitterClient;
 };
 
-async function formatDesc(client, text) {
-    let desc = ``;
-    let rows = text?.split('\n');
+async function formatDesc(client: any, text: string) { // you found a wrong person to fuck with
+    let desc: string = ``;
+    let rows: string[] = text?.split('\n');
 
-    rows?.forEach(async (line, i) => {
-        let array = line?.split(' ');
-        array?.forEach(async (x, j) => {
-            let tagCheck = x.match(/(\@[a-zA-Z0-9_%]*)/g);
-            let linkCheck = x?.match(/http(?:s)?:\/\/(?:www\.)?t\.co\/([a-zA-Z0-9_]+)/g);
+    let i: number = 0; for await (let line of rows) {
+        i++;
+
+        let array: string[] = line?.split(' ');
+
+        let j: number = 0; for await (let x of array) {
+            j++;
+
+            let tagCheck: (RegExpMatchArray | null) = x.match(/(\@[a-zA-Z0-9_%]*)/g);
+            let linkCheck: (RegExpMatchArray | null) = x?.match(/http(?:s)?:\/\/(?:www\.)?t\.co\/([a-zA-Z0-9_]+)/g);
 
             if (tagCheck) array[j] = x.replace((/(\@[a-zA-Z0-9_%]*)/g), `[${x}](https://twitter.com/${x})`);
             if (linkCheck) {
                 await fetch(x, {
                     redirect: 'follow',
                     follow: 10,
-                }).then(async (response) => {
+                } as { redirect: 'follow', follow: number }).then(async (response: any) => {
                     let shortUrl = new URL(response?.url)?.hostname?.replace('www', '');
                     if (shortUrl != `twitter.com`) {
                         array[j] = x.replace((/http(?:s)?:\/\/(?:www\.)?t\.co\/([a-zA-Z0-9_]+)/g), `[${shortUrl}](${response?.url})`); // regex will broke sometimes (rarely), idc
-                        await client.wait(1000 * 2);
+                        await client?.wait?.(1000 * 2);
                     } else {
                         array[j] = ``; // love it
                     };
                 }).catch(() => null);
             };
-        });
+        };
 
-        await client.wait(2000 * 5);
         desc += (`> ` + (array?.length <= 1 ? array?.[0] : array?.join(' ')) + `\n`);
-    });
+    };
     
-    await client.wait(2200 * (((text?.split('\n')?.length + text?.split(' ')?.length) < 4 ? 5 : (text?.split('\n')?.length + text?.split(' ')?.length))) + 2200); // this will delay a loot sometimes, also idc
-    return (desc != 0 ? desc : null);
+    return (desc != '0' ? desc : ``);
 };
