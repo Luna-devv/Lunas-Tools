@@ -3,7 +3,7 @@ import Logger from '../modules/logger';
 
 export default {
     name: 'messageCreate',
-    run: async (message: any, client: any) => {
+    run: async (client: any, message: any) => {
         if (message?.author?.id == client.user.id) return;
 
         switch (message.channel.id) {
