@@ -2,8 +2,7 @@
  *  Copyright (c) 2022 Luna Seemann
  *  https://github.com/Luna-devv/lunas-tools/blob/main/LICENSE
  * 
- *  First rename the json/config.example.ts to config.ts,
- *  then run the following commands:
+ *  First fill out json/config.ts, then run the following commands:
  *
  *  npm install
  *  npm run ts
