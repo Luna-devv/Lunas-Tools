@@ -2,7 +2,7 @@ import { GuildMember } from 'discord.js';
 
 export default {
     name: `messageReactionAdd`,
-    run: async (reaction: any, user: GuildMember) => {
+    run: async (client: any, reaction: any, user: GuildMember) => {
         if (reaction.partial) await reaction.fetch().catch(() => null);
         if (reaction.message?.partial) await reaction.message?.fetch().catch(() => null);
 

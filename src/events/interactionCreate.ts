@@ -4,7 +4,7 @@ import Discord from 'discord.js';
 
 export default {
     name: 'interactionCreate',
-    run: async (interaction: any, client: any) => {
+    run: async (client: any, interaction: any) => {
 
         if (interaction.type == Discord.InteractionType.ApplicationCommand) {
             const command: CommandType = client.interactions.get(interaction.commandName);
