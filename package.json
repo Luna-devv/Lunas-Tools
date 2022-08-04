@@ -15,7 +15,6 @@
     "chalk": "^4.1.2",
     "discord.js": "^14.1.2",
     "express": "^4.17.3",
-    "node-fetch": "^3.2.6",
     "node-tweet-stream": "^2.1.0"
   },
   "devDependencies": {
