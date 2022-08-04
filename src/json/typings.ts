@@ -1,0 +1,42 @@
+export type Config = {
+    server_id: string;
+    authToken: string;
+    token: string;
+    server: {
+        port: number;
+    };
+    twitter: {
+        users: {
+            id: string;
+            name: string;
+        }[];
+        channels: string[];
+        twitterConsumerKey: string;
+        twitterConsumerSecret: string;
+        twitterAccessTokenKey: string;
+        twitterAccessTokenSecret: string;
+    }
+};
+
+export type CustomActivityType = {
+    applicationId: string | null;
+    name: string | null;
+    url: string | null;
+    details: string | null;
+    state: string | null;
+    createdTimestamp: number | null;
+    timestamps: {
+        start: number | null;
+        end: number | null;
+    };
+    assets: {
+        large: {
+            text: string | null | undefined;
+            image: string | null;
+        },
+        small: {
+            text: string | null | undefined;
+            image: string | null;
+        }
+    };
+}

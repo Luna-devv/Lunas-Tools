@@ -4,15 +4,24 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "ts": "npm install tsc typescript --save-dev -g",
+    "init": "npm install && npm run build && npm run start",
+    "start": "cd dist && node index --no-warning",
+    "build": "tsc --build",
+    "watch": "tsc --watch"
   },
-  "author": "",
+  "author": "Luna-devv",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.26.1",
     "chalk": "^4.1.2",
-    "discord.js": "^13.6.0",
+    "discord.js": "^14.1.2",
     "express": "^4.17.3",
+    "node-fetch": "^3.2.6",
     "node-tweet-stream": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^18.6.3",
+    "typescript": "^4.7.3"
   }
 }

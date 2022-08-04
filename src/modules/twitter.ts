@@ -1,8 +1,8 @@
 const { start, log } = require(`../functions/logger`);
-const Twit = require("node-tweet-stream");
+import Twit from 'node-tweet-stream';
 
-module.exports = async (client) => {
-    const twitterClient = new Twit({
+module.exports = async (client: any) => {
+    const twitterClient: any = new Twit({
         consumer_key: client.twitter.twitterConsumerKey,
         consumer_secret: client.twitter.twitterConsumerSecret,
         token: client.twitter.twitterAccessTokenKey,

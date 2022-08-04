@@ -1,41 +1,45 @@
-const { request, response } = require('express');
-const client = require('../app');
+import { Activity, GuildMember, User } from 'discord.js';
+import { CustomActivityType } from 'src/json/typings';
+import { Request, Response } from 'express';
+import client from '../app';
 
-module.exports = [{
+export default [{
     path: '/losti',
     method: 'get',
-    /**
-     * 
-     * @param {request} req 
-     * @param {response} res 
-     */
-    run: async (req, res) => {
+    run: async (req: Request, res: Response) => {
 
-        const forcelosti = await client.users.fetch(`421991668556759042`, { force: true });
-        const losti = await (await client.guilds.cache.get(`810248284861366332`))?.members.fetch(`421991668556759042`);
+        const forceLosti: User = await client.users.fetch(`421991668556759042`, { force: true });
+        const losti: GuildMember = await (await client.guilds.cache.get(`828676951023550495`))?.members.fetch(`421991668556759042`);
 
-        if (!losti?.user?.id || !forcelosti?.id) return res.status(500).json({
+        if (!losti?.user?.id || !forceLosti?.id) return res.status(500).json({
             status: 500,
-            message: `Cannot fetch losti`
+            message: `Cannot fetch Losti.`
         });
 
-        let color = `#747F8D`
+        let color: string = `#999999`;
         switch (losti.presence?.status) {
-            case `online`: { color = `#57F287`; break; }
-            case `dnd`: { color = `#ED4245`; break; }
-            case `idle`: { color = `#FEE75C`; break; }
+            case `online`: { color = `#7bcba7`; break; };
+            case `dnd`: { color = `#f17f7e`; break; };
+            case `idle`: { color = `#fcc061`; break; };
         };
 
-        let emote, text;
-        if (losti.presence?.activities.find(activitie => activitie.type === `CUSTOM`)) {
-            const status = await losti.presence?.activities.find(activitie => activitie.type === `CUSTOM`);
-            if (status.emoji?.id) emote = `https://cdn.discordapp.com/emojis/${status.emoji.id}.${status.emoji.animated ? `gif` : `png`}?size=2048`;
-            if (status.state) text = status.state;
+        let emote: string | undefined, text: string | undefined;
+        if (losti.presence?.activities.find(activitie => activitie.type == 4)) {
+            const status: (Activity | undefined) = losti.presence?.activities.find(activitie => activitie.type == 4);
+            if (status?.emoji?.id) emote = `https://cdn.discordapp.com/emojis/${status.emoji.id}.${status.emoji.animated ? `gif` : `png`}?size=2048`;
+            if (status?.state) text = status.state;
         };
-        let status = { state: { text: losti.presence?.status, color: color }, emote: emote, text: text };
+        let status: {
+            state: {
+                text: string | undefined,
+                color: string | undefined,
+            },
+            emote: string | undefined,
+            text: string | undefined,
+        } = { state: { text: losti.presence?.status, color: color }, emote: emote, text: text };
 
-        let activities = [];
-        losti.presence?.activities?.forEach((activitie) => {
+        let activities: CustomActivityType[] = [];
+        losti.presence?.activities?.forEach((activitie: Activity) => {
             if (activitie.name == `Spotify`) {
                 activities.push({
                     applicationId: activitie.applicationId,
@@ -92,14 +96,14 @@ module.exports = [{
                 id: losti.user.id,
                 username: losti.user.username,
                 discriminator: losti.user.discriminator,
-                nickname: losti.nickanme || losti.user.username,
+                nickname: losti.nickname || losti.user.username,
                 nickavatar: losti.avatar ? `https://cdn.discordapp.com/guilds/${losti.guild.id}/users/${losti.id}/avatars/${losti.avatar}.${losti.avatar?.startsWith(`a_`) ? `gif` : `png`}?size=2048` : null,
                 status: status,
                 activities: activities,
                 createdTimestamp: losti.user.createdTimestamp,
                 avatar: losti.user.avatar ? `https://cdn.discordapp.com/avatars/${losti.user.id}/${losti.user.avatar}.${losti.user.avatar?.startsWith('a_') ? 'gif' : 'png'}?size=2048` : null,
-                banner: forcelosti.banner ? `https://cdn.discordapp.com/banners/${losti.user.id}/${forcelosti.banner}.${forcelosti.banner?.startsWith('a_') ? 'gif' : 'png'}?size=600` : null,
-                accentColor: `#${parseInt(forcelosti.accentColor, 10).toString(16)}`
+                banner: forceLosti.banner ? `https://cdn.discordapp.com/banners/${losti.user.id}/${forceLosti.banner}.${forceLosti.banner?.startsWith('a_') ? 'gif' : 'png'}?size=600` : null,
+                accentColor: `#${parseInt(forceLosti?.accentColor?.toString() || `6057195`, 10).toString(16)}`
             }
         });
 
