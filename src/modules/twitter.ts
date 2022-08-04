@@ -10,10 +10,12 @@ export default async (client: any) => {
         token_secret: client?.config?.twitter?.twitterAccessTokenSecret
     });
 
+    client.twitterClient = twitterClient;
+
     twitterClient.on('tweet', async (tweet: any) => {
         if (tweet?.in_reply_to_screen_name) return;
 
-        for await (let user of client?.config?.twitter?.users) {
+        client?.config?.twitter?.users?.forEach(async (user: { id: string, name: string }) => {
             if (tweet.user.id == user.id && tweet.user.screen_name == user.name) {
 
                 let buttons: ButtonObject[] = [{
@@ -35,6 +37,8 @@ export default async (client: any) => {
 
                     tweet.entities.media = tweet?.quoted_status?.entities?.media
                 };
+
+                if (tweet?.text?.startsWith(`RT`))  tweet.text = tweet.text?.replace(`RT @${tweet?.retweeted_status?.user?.screen_name}:`, `Retweet from @${tweet?.retweeted_status?.user?.screen_name} :`);
 
                 let desc: (string | null) = await formatDesc(client, tweet?.text); // don't blame me lmao
 
@@ -68,10 +72,8 @@ export default async (client: any) => {
                     };
                 });
             };
-        };
+        });
     });
-
-    client.twitterClient = twitterClient;
 };
 
 async function formatDesc(client: any, text: string) { // you found a wrong person to fuck with
