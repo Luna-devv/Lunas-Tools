@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     server_id: '',
     authToken: '',
     token: '',
@@ -7,12 +7,12 @@ module.exports = {
     },
     twitter: {
         users: [{
-            id: '1376526278182993925',
-            name: 'Luni_sia',
+            id: '',
+            name: '',
         }],
         channels: [''],
-        twitterConsumerKey: '',
-        twitterConsumerSecret: '',
+        twitterApiKey: '',
+        twitterApiSecret: '',
         twitterAccessTokenKey: '',
         twitterAccessTokenSecret: ''
     }
