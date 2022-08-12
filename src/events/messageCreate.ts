@@ -21,9 +21,9 @@ export default {
 
                     return Logger.log(`App`, `Banned ${message.member.user.tag}`, `green`);
                 };
-
                 if (!message.content && !message.embeds) return;
-                if (((message.embeds[0]?.color == `#7289da`) || !message.embeds[0]?.color) && message.embeds[0]) message.embeds[0].color = `#cd4065`;
+                
+		if (message.embeds?.[0]?.title.includes("[Luna-devv/Waya-Translations] Pull request opened")) return;
 
                 client.channels.cache.get(`883824288300400682`).send({
                     content: message.content ? message.content : null,
