@@ -8,8 +8,6 @@ export default {
 
         switch (message.channel.id) {
             case `888790310732324984`: {    // introduce your self
-                if (!message.guild.me.permissions.has(`MANAGE_CHANNELS`)) return;
-
                 message.channel.permissionOverwrites.edit(message.member.user.id, { SendMessages: false });
                 break;
             };
