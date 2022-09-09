@@ -1,9 +1,13 @@
+import { Client, CommandInteraction } from "discord.js";
+
 export default {
 	name: 'graph',
-	run: async (interaction: any, client: any) => {
+	run: async (interaction: CommandInteraction, client: Client) => {
+		//@ts-ignore
 		let user = await client.users.fetch(interaction.options.getString('id'), { force: true }).catch(() => null);
 
-		if (!interaction.options.getString('id') || !user?.bot)
+
+		if (!user?.bot)
 			return interaction.reply({
 				content: `Provided bot ID is not valid!`,
 				ephemeral: true,
@@ -12,7 +16,7 @@ export default {
 		let data: any = await fetch(`https://dblstatistics.com/api/bots/${user?.id}`, {
 			method: `get`,
 			headers: {
-				Authorization: client?.config?.authToken,
+				Authorization: (client as any)?.config?.authToken,
 			} as {
 				[x: string]: string;
 			},
@@ -25,6 +29,7 @@ export default {
 			});
 
 		return interaction.reply({
+			//@ts-ignore
 			content: `https://dblstatistics.com/bot/${data.data.id}/widget/${interaction.options.getString(
 				'data'
 			)}?width=3000&height=1000&backgroundColor=26252e&titleFontSize=30&labelFontSize=28&cache=${new Date(Date.now()).getTime()}`,
