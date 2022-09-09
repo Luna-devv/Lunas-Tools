@@ -2,42 +2,43 @@ import chalk, { Chalk } from 'chalk';
 let interval: NodeJS.Timeout;
 
 const Module = {
-    start: (type: string, text: string, color: keyof Chalk) => {
-        if (!type) throw new TypeError(`'Type' is undefined`);
-        if (!text) throw new TypeError(`'Text' is undefined`);
-        console.clear()
-        const chars = ["| ", "/ ", "- ", "\\ "];
-        var i = 0;
-        
-        let textColor: any = chalk[color || 'grey'];
+	start: (type: string, text: string, color: keyof Chalk) => {
+		if (!type) throw new TypeError(`'Type' is undefined`);
+		if (!text) throw new TypeError(`'Text' is undefined`);
+		console.clear();
+		const chars = ['| ', '/ ', '- ', '\\ '];
+		var i = 0;
 
-        interval = setInterval(() => {
-            process.stdout.write(`\r` + chalk.gray(chars[i]) + textColor(`[${type}] `) + textColor(text));
-            i++;
-            if (i == chars.length) i = 0;
-        }, 100);
-    },
+		let textColor: any = chalk[color || 'grey'];
 
-    end: (type: string, text: string, color: keyof Chalk) => {
-        if (!type) throw new TypeError(`'Type' is undefined`);
-        if (!text) throw new TypeError(`'Text' is undefined`);
-        
-        let first: any = chalk[color || 'grey'];
-        let second: any = chalk[(color + `Bright`) || 'white'];
+		interval = setInterval(() => {
+			process.stdout.write(`\r` + chalk.gray(chars[i]) + textColor(`[${type}] `) + textColor(text));
+			i++;
+			if (i == chars.length) i = 0;
+		}, 100);
+	},
 
-        clearInterval(interval); console.clear();
-        console.log(first(`[${type}] `) + second(text));
-    },
+	end: (type: string, text: string, color: keyof Chalk) => {
+		if (!type) throw new TypeError(`'Type' is undefined`);
+		if (!text) throw new TypeError(`'Text' is undefined`);
 
-    log: (type: string, text: string, color: keyof Chalk) => {
-        if (!type) throw new TypeError(`'Type' is undefined`);
-        if (!text) throw new TypeError(`'Text' is undefined`);
-        
-        let first: any = chalk[color || 'grey'];
-        let second: any = chalk[(color + `Bright`) || 'white'];
-        
-        console.log(first(`[${type}] `) + second(text));
-    },
+		let first: any = chalk[color || 'grey'];
+		let second: any = chalk[color + `Bright` || 'white'];
+
+		clearInterval(interval);
+		console.clear();
+		console.log(first(`[${type}] `) + second(text));
+	},
+
+	log: (type: string, text: string, color: keyof Chalk) => {
+		if (!type) throw new TypeError(`'Type' is undefined`);
+		if (!text) throw new TypeError(`'Text' is undefined`);
+
+		let first: any = chalk[color || 'grey'];
+		let second: any = chalk[color + `Bright` || 'white'];
+
+		console.log(first(`[${type}] `) + second(text));
+	},
 };
 
 export default Module;

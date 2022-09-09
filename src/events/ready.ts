@@ -7,8 +7,12 @@ export default {
     once: true,
 
     run: async (client: any) => {
-
-        ['828676951023550495', '810248284861366332'].forEach((guild) => client.guilds.cache.get(guild)?.commands.set([]).catch(() => null)); // test guilds
+        ['828676951023550495', '810248284861366332'].forEach((guild) =>
+            client.guilds.cache
+                .get(guild)
+                ?.commands.set([])
+                .catch(() => null)
+        ); // test guilds
         await client?.application?.commands?.set(require('../json/interactionsData').default); // all guilds
 
         const banners = fs.readdirSync(path.join(__dirname, '../../banners'));
@@ -28,9 +32,9 @@ export default {
         Logger.end(`App`, `Connected as ${client?.user?.tag}.`, `blue`);
 
         // start twitter client
-        client?.config?.twitter?.users?.forEach((user: { id: string, name: string }) => {
+        client?.config?.twitter?.users?.forEach((user: { id: string; name: string }) => {
             client.twitterClient.follow(user?.id);
             Logger.log(`Twitter`, `Started Following @${user.name}.`, `cyan`);
         });
-    }
+    },
 };
