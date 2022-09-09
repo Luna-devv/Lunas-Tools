@@ -1,11 +1,10 @@
-import { Client, CommandInteraction } from "discord.js";
+import { Client, CommandInteraction } from 'discord.js';
 
 export default {
 	name: 'graph',
 	run: async (interaction: CommandInteraction, client: Client) => {
 		//@ts-ignore
 		let user = await client.users.fetch(interaction.options.getString('id'), { force: true }).catch(() => null);
-
 
 		if (!user?.bot)
 			return interaction.reply({

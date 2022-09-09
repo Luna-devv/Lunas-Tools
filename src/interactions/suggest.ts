@@ -1,4 +1,4 @@
-import { Client, CommandInteraction, TextChannel } from "discord.js";
+import { Client, CommandInteraction, TextChannel } from 'discord.js';
 
 export default {
     name: 'suggest',
@@ -9,57 +9,57 @@ export default {
 
         switch (command) {
             case 'create': {
-
                 //@ts-ignore
                 const suggestion = interaction.options.getString('suggestion');
-                await (client.channels.cache.get((client as any).config.suggestions) as TextChannel)
-                    ?.send({
-                        embeds: [
-                            {
-                                author: {
-                                    name: interaction.user.tag,
-                                    icon_url: interaction.user.displayAvatarURL()
+                await (client.channels.cache.get((client as any).config.suggestions) as TextChannel)?.send({
+                    embeds: [
+                        {
+                            author: {
+                                name: interaction.user.tag,
+                                icon_url: interaction.user.displayAvatarURL(),
+                            },
+                            fields: [
+                                {
+                                    name: `<t:${Math.floor(new Date().getTime() / 1000)}:t> <t:${Math.floor(new Date().getTime() / 1000)}:d> • Suggestion`,
+                                    value: suggestion,
                                 },
-                                fields: [
-                                    {
-                                        name: `<t:${Math.floor(new Date().getTime() / 1000)}:t> <t:${Math.floor(new Date().getTime() / 1000)}:d> • Suggestion`,
-                                        value: suggestion
-                                    }
-                                ],
-                                color: 0xbda9a8
-                            }
-                        ]
-                    });
+                            ],
+                            color: 0xbda9a8,
+                        },
+                    ],
+                });
 
                 interaction.editReply({
-                    content: 'Your Suggestion has been successfully submited'
+                    content: 'Your Suggestion has been successfully submited',
                 });
 
                 break; //end 'write'
             }
             case 'manage': {
-                if (!interaction.memberPermissions?.has('Administrator')) return interaction.editReply({
-                    content: 'lol no perms'
-                });
+                if (!interaction.memberPermissions?.has('Administrator'))
+                    return interaction.editReply({
+                        content: 'lol no perms',
+                    });
 
                 const channel = client.channels.cache.get((client as any).config.suggestions);
                 //@ts-ignore
-                const message = (channel as TextChannel).messages.cache.get(interaction.options.getString('id')) || await (channel as TextChannel).messages.fetch(interaction.options.getString('id'))
+                const message = (channel as TextChannel).messages.cache.get(interaction.options.getString('id')) || (await (channel as TextChannel).messages.fetch(interaction.options.getString('id')));
                 //@ts-ignore
                 const option = interaction.options.getString('option');
                 //@ts-ignore
                 const reason = interaction.options.getString('reason');
 
-                if (!message) return interaction.editReply({
-                    content: 'no message lol'
-                });
+                if (!message)
+                    return interaction.editReply({
+                        content: 'no message lol',
+                    });
 
                 if (option === 'delete') return message.delete();
 
                 const fields = message.embeds[0].fields;
                 fields.push({
                     name: `<t:${Math.floor(new Date().getTime() / 1000)}:t> <t:${Math.floor(new Date().getTime() / 1000)}:d> • ${getSuckName(option)}`,
-                    value: reason
+                    value: reason,
                 });
 
                 await message.edit({
@@ -67,19 +67,18 @@ export default {
                         {
                             author: message.embeds[0].author || undefined,
                             fields: fields,
-                            color: getColorStuff(option)
-                        }
-                    ]
-                })
+                            color: getColorStuff(option),
+                        },
+                    ],
+                });
 
                 interaction.editReply({
-                    content: 'done'
+                    content: 'done',
                 });
 
                 break; //end 'write'
             }
-        };
-
+        }
     },
 };
 
