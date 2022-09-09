@@ -11,7 +11,7 @@ export default {
             case 'create': {
                 //@ts-ignore
                 const suggestion = interaction.options.getString('suggestion');
-                await (client.channels.cache.get((client as any).config.suggestions) as TextChannel)?.send({
+                const message = await (client.channels.cache.get((client as any).config.suggestions) as TextChannel)?.send({
                     embeds: [
                         {
                             author: {
@@ -28,6 +28,9 @@ export default {
                         },
                     ],
                 });
+
+                message.react('<:tick:1017781086102761543>');
+                message.react('<:cross:1017781065340964934>');
 
                 interaction.editReply({
                     content: 'Your Suggestion has been successfully submited',
