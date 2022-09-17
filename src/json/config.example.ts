@@ -1,5 +1,4 @@
 export default {
-	server_id: '',
 	suggestions: '',
 	authToken: '',
 	token: '',
