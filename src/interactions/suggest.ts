@@ -85,12 +85,14 @@ export default {
     },
 };
 
-function getColorStuff(thing: 'consider' | 'accept' | 'already' | 'deny'): number {
+function getColorStuff(thing: 'consider' | 'accept' | 'done' | 'already' | 'deny'): number {
     switch (thing) {
         case 'consider':
             return 0xbdb58a;
         case 'accept':
             return 0x8da895;
+        case 'done':
+            return 0x94c293;
         case 'already':
             return 0x8abdba;
         case 'deny':
@@ -98,12 +100,14 @@ function getColorStuff(thing: 'consider' | 'accept' | 'already' | 'deny'): numbe
     }
 }
 
-function getSuckName(thing: 'consider' | 'accept' | 'already' | 'deny'): string {
+function getSuckName(thing: 'consider' | 'accept' | 'done' | 'already' | 'deny'): string {
     switch (thing) {
         case 'consider':
             return 'Considered';
         case 'accept':
             return 'Accepted';
+        case 'done':
+            return 'Implemented';
         case 'already':
             return 'Already Implemented';
         case 'deny':

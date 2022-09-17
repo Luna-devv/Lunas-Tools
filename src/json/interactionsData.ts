@@ -77,6 +77,10 @@ export default [
 								value: 'accept',
 							},
 							{
+								name: 'Implemented',
+								value: 'done',
+							},
+							{
 								name: 'Alread Implemented',
 								value: 'already',
 							},
