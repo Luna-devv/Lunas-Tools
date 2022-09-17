@@ -47,7 +47,6 @@ export default async (client: any) => {
 
 				let desc: string | null = await formatDesc(client, tweet?.text); // don't blame me lmao
 
-				console.log(JSON.stringify(tweet?.entities, null, 5));
 				client?.config?.twitter?.channels?.forEach((id: any) => {
 					try {
 						let channel: any = client?.channels?.cache?.get(id); // just no, ffs

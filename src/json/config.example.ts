@@ -1,6 +1,7 @@
 export default {
 	suggestions: '',
 	authToken: '',
+	spellKey: '',
 	token: '',
 	server: {
 		port: 3000,
