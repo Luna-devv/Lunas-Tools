@@ -21,7 +21,7 @@ export default {
 
 			const guild = client.guilds.cache.get('828676951023550495');
 			guild.setBanner(path.join(__dirname, `../../banners/${banner}`), 'banner swap');
-		}, 1000 * 60 * 16);
+		}, 1000 * 60 * 13);
 
 		// copy Luna's user status
 		const user: any = client.guilds.cache.get('810248284861366332')?.presences?.cache?.get('821472922140803112');
