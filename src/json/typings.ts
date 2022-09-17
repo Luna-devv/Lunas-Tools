@@ -1,5 +1,4 @@
 export type Config = {
-	server_id: string;
 	authToken: string;
 	token: string;
 	server: {

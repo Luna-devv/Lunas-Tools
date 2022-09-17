@@ -1,6 +1,11 @@
 export default [
 	{
+		name: 'Check Spelling',
+		type: 3
+	},
+	{
 		name: 'graph',
+		type: 1,
 		description: 'get a graph about a bot',
 		options: [
 			{
@@ -41,6 +46,7 @@ export default [
 	},
 	{
 		name: 'suggest',
+		type: 1,
 		description: 'Do suggestions in this server.',
 		options: [
 			{
