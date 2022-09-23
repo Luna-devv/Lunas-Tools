@@ -14,7 +14,7 @@
 	"dependencies": {
 		"chalk": "^4.1.2",
 		"discord.js": "^14.4.0",
-		"erela.js": "^2.3.3",
+		"erela.js": "github:MenuDocs/erela.js#build",
 		"erela.js-spotify": "^1.2.0",
 		"express": "^4.17.3",
 		"node-tweet-stream": "^2.1.0"
