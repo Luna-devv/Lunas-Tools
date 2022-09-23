@@ -31,6 +31,9 @@ export default {
 
 		Logger.end(`App`, `Connected as ${client?.user?.tag}.`, `blue`);
 
+		// start music player
+		client.manager.init(client.user.id);
+
 		// start twitter client
 		client?.config?.twitter?.users?.forEach((user: { id: string; name: string }) => {
 			client.twitterClient.follow(user?.id);

@@ -19,4 +19,16 @@ export default {
 		twitterAccessTokenKey: '',
 		twitterAccessTokenSecret: '',
 	},
+	spotify: {
+		clientId: '',
+		clientSecret: '',
+	},
+	nodes: [
+		{
+			host: '',
+			port: 443,
+			password: '',
+			secure: true,
+		}
+	]
 };
