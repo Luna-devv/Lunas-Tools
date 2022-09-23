@@ -1,4 +1,4 @@
-import { volumeSet, pauseSong, skipSong, previousSong, loopToggle, shuffleToggle, queue } from '../modules/music';
+import { volumeSet, pauseSong, skipSong, previousSong, loopToggle, shuffleToggle, queue, volumeSong } from '../modules/music';
 import { VoiceBasedChannel } from 'discord.js';
 import { findPlatforms } from '../modules/music';
 
@@ -251,6 +251,28 @@ export default {
 			};
 
 			//@ts-ignore
+		} else if (interaction?.options?.getSubcommand() == `volume`) {
+			let voiceChannel: VoiceBasedChannel = (interaction as any)?.member?.voice?.channel;
+
+			if (!voiceChannel) {
+				interaction.editReply({
+					content: `You need to be in a voice channel to use this button!`,
+				});
+			} else {
+				let player = client.players.list[voiceChannel?.id];
+
+				if (!player) return interaction.editReply({ content: `There is no music playing in this channel!`, ephemeral: true });
+				else if (interaction?.member?.voice?.channel?.id !== player?.voiceChannel) return interaction.reply({ content: `> You must be in the same voice channel as the bot to use this button!`, ephemeral: true });
+				else {
+					interaction?.editReply({
+						content: `Volume has been changed!`,
+					});
+
+					volumeSong(client, interaction, player, interaction?.options?.getNumber(`volume`));
+				};
+			};
+
+			//@ts-ignore
 		};
 	},
 };
@@ -282,13 +304,13 @@ async function playSong(interaction: any, client: any, data: any, click: any, de
 		case "NO_MATCHES": {
 			message.edit({
 				content: `No tracks found!`,
-			});
+			}).catch(() => null);
 
 			break;
 		};
 		case "TRACK_LOADED": {
 			client.players.list[voiceChannelId].queue.add(res?.tracks[0]);
-			client.players.messages[voiceChannelId] = message?.id;;
+			client.players.messages[voiceChannelId] = message?.id;
 
 			if (!client.players.list[voiceChannelId].playing) await client.players.list[voiceChannelId].play(); break;
 		};
@@ -310,7 +332,7 @@ async function playSong(interaction: any, client: any, data: any, click: any, de
 
 			message.edit({
 				content: `An error while searching occured (load failed)!`,
-			});
+			}).catch(() => null);
 
 			break;
 		};
@@ -320,7 +342,7 @@ async function playSong(interaction: any, client: any, data: any, click: any, de
 
 			message.edit({
 				content: `An internal error occured!`,
-			});
+			}).catch(() => null);
 
 			break;
 		};

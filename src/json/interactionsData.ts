@@ -55,6 +55,21 @@ export default [
 				]
 			},
 			{
+				name: 'volume',
+				type: 1,
+				description: 'Change the volume',
+				options: [
+					{
+						name: 'percentage',
+						type: 10,
+						description: 'The volume percentage',
+						required: true,
+						min_value: 0,
+						max_value: 100
+					}
+				]
+			},
+			{
 				name: 'skip',
 				type: 1,
 				description: 'Skip the current song',

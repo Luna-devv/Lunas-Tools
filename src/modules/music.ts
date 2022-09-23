@@ -165,7 +165,7 @@ export async function pauseSong(client: any, interaction: any, player: Player) {
 	    		}
 	    	],
             components: getComponents(player),
-        });
+        }).catch(() => null);
     } else {
         player.pause(true);
 
@@ -184,7 +184,7 @@ export async function pauseSong(client: any, interaction: any, player: Player) {
 	    		}
 	    	],
             components: getComponents(player),
-        });
+        }).catch(() => null);
     };
 };
 
@@ -206,7 +206,7 @@ export async function volumeSet(client: any, interaction: any, player: Player) {
             }
         ],
         components: getComponents(player),
-    });
+    }).catch(() => null);
 };
 
 export async function skipSong(client: any, interaction: any, player: Player) {
@@ -227,7 +227,7 @@ export async function skipSong(client: any, interaction: any, player: Player) {
             }
         ],
         components: getComponents(player),
-    });
+    }).catch(() => null);
 };
 
 export async function previousSong(client: any, interaction: any, player: Player) {
@@ -248,7 +248,7 @@ export async function previousSong(client: any, interaction: any, player: Player
             }
         ],
         components: getComponents(player),
-    });
+    }).catch(() => null);
 };
 
 export async function loopToggle(client: any, interaction: any, player: Player) {
@@ -270,7 +270,7 @@ export async function loopToggle(client: any, interaction: any, player: Player) 
                 }
             ],
             components: getComponents(player),
-        });
+        }).catch(() => null);
     } else {
         player.setTrackRepeat(true);
 
@@ -289,7 +289,7 @@ export async function loopToggle(client: any, interaction: any, player: Player) 
                 }
             ],
             components: getComponents(player),
-        });
+        }).catch(() => null);
     };
 };
 
@@ -311,7 +311,7 @@ export async function shuffleToggle(client: any, interaction: any, player: Playe
             }
         ],
         components: getComponents(player),
-    });
+    }).catch(() => null);
 };
 
 export async function queue(client: any, interaction: any, player: Player) {
@@ -344,3 +344,24 @@ export async function queue(client: any, interaction: any, player: Player) {
         }).catch(() => null);
     });
 };
+
+export async function volumeSong(client: any, interaction: any, player: Player, volume: number) {
+    player.setVolume(volume);
+
+    client.channels.cache.get(player.textChannel)?.messages.cache.get(client.players.messages[(player as any).voiceChannel])?.edit({
+        embeds: [
+            {
+                color: 15447957,
+                image: {
+                    url: `https://cdn.crni.xyz/r/invisible.png`
+                },
+                description: `> Currently playing [${(player as any)?.queue?.current?.title?.length > 40 ? `${player?.queue?.current?.title?.slice(0, 40)}..` : player?.queue?.current?.title}](${player?.queue?.current?.uri})..\n> It's duration is ${player?.queue?.current?.isStream ? `infinite` : `${client.formatTime(player?.queue?.current?.duration)}`}.`,
+                footer: {
+                    text: `Volume changed by ${interaction.member.user.tag}`,
+                    iconURL: interaction.member.user.displayAvatarURL()
+                }
+            }
+        ],
+        components: getComponents(player),
+    }).catch(() => null);
+}
