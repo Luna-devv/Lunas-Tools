@@ -8,6 +8,6 @@ export default function (client: any) {
 		const event = require(path.join(__dirname, `..`, `events`, file)).default;
 
 		const argumentsFunction = (...args: any) => event.run(client, ...args);
-		event.once ? client.once(event.name, argumentsFunction) : client.on(event.name, argumentsFunction);
+		event.once ? client.once(event.name, argumentsFunction) : event?.erela ? client.manager.on(event.name, argumentsFunction) : client.on(event.name, argumentsFunction);
 	}
 }

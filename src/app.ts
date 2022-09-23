@@ -14,8 +14,10 @@
 // ---------------------------------------------------- Imports
 
 import Discord from 'discord.js';
+import { Manager } from 'erela.js';
 import config from './json/config';
 import Logger from './modules/logger';
+import Spotify from 'erela.js-spotify';
 
 // ---------------------------------------------------- Discord
 
@@ -40,17 +42,60 @@ const client: any = new Discord.Client({
 		Discord.GatewayIntentBits.MessageContent,
 		Discord.GatewayIntentBits.GuildPresences,
 		Discord.GatewayIntentBits.GuildMessageReactions,
+		Discord.GatewayIntentBits.GuildVoiceStates,
 	],
 	partials: [Discord.Partials.Message, Discord.Partials.Reaction],
 });
 
+// ---------------------------------------------------- Erela.js
+
+const erelaManager = new Manager({
+	nodes: config.nodes,
+	autoPlay: true,
+	send: (id, payload) => {
+		const guild = client.guilds.cache.get(id);
+		if (guild) guild.shard.send(payload);
+	},
+	plugins: [
+		new Spotify({
+			clientID: config.spotify.clientId,
+			clientSecret: config.spotify.clientSecret,
+		})
+	],
+});
+
+client.on(`raw`, (d: any) => erelaManager.updateVoiceState(d));
+
+erelaManager.on(`nodeConnect`, (node) => {
+	Logger.log(`Erela.js`, `Connected to node ${node.options.identifier}.`, `green`);
+});
+
+const errorSpamFilter: any = {};
+erelaManager.on(`nodeError`, (node, error) => {
+	if (!errorSpamFilter[(node as any).options.identifier]) Logger.log(`Erela.js`, `Error on node ${node.options.identifier}: ${error.message}`, `red`); 
+	else errorSpamFilter[(node as any).options.identifier] = true;
+});
+
 // ---------------------------------------------------- Exports & modules
 
+client.players = {
+	list: {},
+	messages: {},
+};
 client.config = config;
 client.logger = Logger;
+client.manager = erelaManager;
 client.interactions = new Discord.Collection();
 client.wait = (time: number) => {
 	return new Promise((smth) => setTimeout(smth, time));
+};
+client.formatTime = (ms: number, short: boolean) => {
+	const sec: string = Math.floor((ms / 1000) % 60).toString();
+	const min: string = Math.floor((ms / (1000 * 60)) % 60).toString();
+	const hrs: string = Math.floor((ms / (1000 * 60 * 60)) % 60).toString();
+
+	if (short) return `${hrs.padStart(2, "0") == "00" ? "" : hrs.padStart(2, "0") + ":"}${min.padStart(2, "0")}:${sec.padStart(2, "0")}`;
+	else return `${hrs.padStart(2, "0") == "00" ? "" : hrs.padStart(2, "0") + " hours "}${min.padStart(2, "0")} minutes and ${sec.padStart(2, "0")} seconds`;
 };
 
 // ---------------------------------------------------- Handlers

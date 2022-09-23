@@ -10,29 +10,49 @@ export default [
 	{
 		name: 'music',
 		type: 1,
-		description: 'Find music platforms',
+		description: 'Play music in your voice channel',
 		options: [
 			{
-				name: 'search',
-				description: 'Search for a song on all platforms with it\'s link',
-				type: 3,
-				required: true
-			},
-			{
-				name: 'visibility',
-				description: 'Visibility of the message',
-				type: 3,
-				required: false,
-				choices: [
+				name: 'platforms',
+				type: 1,
+				description: 'Find music platforms',
+				options: [
 					{
-						name: 'Everyone',
-						value: 'everyone'
+						name: 'search',
+						type: 3,
+						description: 'Search for a song on all platforms with it\'s link',
+						required: true
 					},
 					{
-						name: 'Only Me',
-						value: 'onlyme'
+						name: 'visibility',
+						type: 3,
+						description: 'Visibility of the message',
+						required: false,
+						choices: [
+							{
+								name: 'Everyone',
+								value: 'everyone'
+							},
+							{
+								name: 'Only Me',
+								value: 'onlyme'
+							}
+						],
 					}
-				],
+				]
+			},
+			{
+				name: 'play',
+				type: 1,
+				description: 'Play a song',
+				options: [
+					{
+						name: 'search',
+						type: 3,
+						description: 'Search for a song',
+						required: true
+					}
+				]
 			}
 		]
 	},
@@ -43,15 +63,15 @@ export default [
 		options: [
 			{
 				name: 'id',
+				type: 3,
 				description: 'From what bot do you want to see the graph?',
 				required: true,
-				type: 3,
 			},
 			{
 				name: 'data',
+				type: 3,
 				description: 'What graph do you want to see?',
 				required: true,
-				type: 3,
 				choices: [
 					{
 						name: 'Rank',
@@ -84,13 +104,13 @@ export default [
 		options: [
 			{
 				name: 'create',
-				description: 'Wanna suggest some things for Waya?',
 				type: 1,
+				description: 'Wanna suggest some things for Waya?',
 				options: [
 					{
 						name: 'suggestion',
-						description: 'What do you want to suggest?',
 						type: 3,
+						description: 'What do you want to suggest?',
 						required: true,
 						max_length: 500,
 					},
@@ -98,13 +118,13 @@ export default [
 			},
 			{
 				name: 'manage',
-				description: 'Manage suggestions or delete them.',
 				type: 1,
+				description: 'Manage suggestions or delete them.',
 				options: [
 					{
 						name: 'option',
-						description: 'What action do you want to perform?',
 						type: 3,
+						description: 'What action do you want to perform?',
 						required: true,
 						choices: [
 							{
@@ -135,14 +155,14 @@ export default [
 					},
 					{
 						name: 'id',
-						description: 'Whats the message Id of the suggestion?',
 						type: 3,
+						description: 'Whats the message Id of the suggestion?',
 						required: true,
 					},
 					{
 						name: 'reason',
-						description: 'Why did you choose to perform this action?',
 						type: 3,
+						description: 'Why did you choose to perform this action?',
 						required: true,
 						max_length: 500,
 					},
