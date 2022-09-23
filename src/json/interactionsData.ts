@@ -53,7 +53,47 @@ export default [
 						required: true
 					}
 				]
-			}
+			},
+			{
+				name: 'skip',
+				type: 1,
+				description: 'Skip the current song',
+			},
+			{
+				name: 'previous',
+				type: 1,
+				description: 'Play the previous song',
+			},
+			{
+				name: 'stop',
+				type: 1,
+				description: 'Stop the music',
+			},
+			{
+				name: 'pause',
+				type: 1,
+				description: 'Pause the music',
+			},
+			{
+				name: 'resume',
+				type: 1,
+				description: 'Resume the music',
+			},
+			{
+				name: 'queue',
+				type: 1,
+				description: 'Show the queue',
+			},
+			{
+				name: 'shuffle',
+				type: 1,
+				description: 'Shuffle the queue',
+			},
+			{
+				name: 'loop',
+				type: 1,
+				description: 'Loop the queue',
+			},
 		]
 	},
 	{

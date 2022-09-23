@@ -92,6 +92,13 @@ export function getComponents(player: Player, disabled?: boolean) {
                     emoji: `<:icons_music:860123644201271326>`,
                     custom_id: `shuffle_${player.voiceChannel}`,
                     disabled: disabled
+                },
+                {
+                    type: 2,
+                    style: 2,
+                    emoji: `<:icons_downvote:911135418420953138>`,
+                    custom_id: `movedown_${player.voiceChannel}`,
+                    disabled: disabled
                 }
             ]
         }
@@ -323,5 +330,17 @@ export async function queue(client: any, interaction: any, player: Player) {
                 description: songStrings,
             }
         ],
+    }).catch(() => {
+        interaction.editReply({
+            embeds: [
+                {
+                    color: 15447957,
+                    image: {
+                        url: `https://cdn.crni.xyz/r/invisible.png`
+                    },
+                    description: songStrings,
+                }
+            ],
+        }).catch(() => null);
     });
 };
