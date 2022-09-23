@@ -70,7 +70,7 @@ export default {
                         {
                             author: message.embeds[0].author || undefined,
                             fields: fields,
-                            color: getColorStuff(option),
+                            color: option == 'comment' ? (message.embeds[0].color ?? 0x2f3136) : getColorStuff(option),
                         },
                     ],
                 });
@@ -100,8 +100,10 @@ function getColorStuff(thing: 'consider' | 'accept' | 'done' | 'already' | 'deny
     }
 }
 
-function getSuckName(thing: 'consider' | 'accept' | 'done' | 'already' | 'deny'): string {
+function getSuckName(thing: 'comment' | 'consider' | 'accept' | 'done' | 'already' | 'deny'): string {
     switch (thing) {
+        case 'comment':
+            return 'Comment';
         case 'consider':
             return 'Considered';
         case 'accept':

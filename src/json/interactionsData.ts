@@ -128,6 +128,10 @@ export default [
 						required: true,
 						choices: [
 							{
+								name: 'Comment',
+								value: 'comment',
+							},
+							{
 								name: 'Consider',
 								value: 'consider',
 							},
