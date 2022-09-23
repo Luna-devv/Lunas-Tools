@@ -127,4 +127,4 @@ async function formatDesc(client: any, text: string) {
 	}
 
 	return desc != '0' ? desc : ``;
-}
+};

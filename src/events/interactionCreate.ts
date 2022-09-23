@@ -1,11 +1,11 @@
 import { CommandType } from '../json/typings';
 import Logger from '../modules/logger';
-import Discord from 'discord.js';
 
 export default {
 	name: 'interactionCreate',
 	run: async (client: any, interaction: any) => {
 		if (interaction.isCommand()) {
+			if (interaction.commandName == `music`) interaction.commandName = `Find Music Platforms`;
 			const command: CommandType = client.interactions.get(interaction.commandName);
 
 			if (!interaction.guild?.id)

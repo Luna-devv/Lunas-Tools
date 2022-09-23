@@ -4,9 +4,42 @@ export default [
 		type: 3
 	},
 	{
+		name: 'Find Music Platforms',
+		type: 3
+	},
+	{
+		name: 'music',
+		type: 1,
+		description: 'Find music platforms',
+		options: [
+			{
+				name: 'search',
+				description: 'Search for a song on all platforms with it\'s link',
+				type: 3,
+				required: true
+			},
+			{
+				name: 'visibility',
+				description: 'Visibility of the message',
+				type: 3,
+				required: false,
+				choices: [
+					{
+						name: 'Everyone',
+						value: 'everyone'
+					},
+					{
+						name: 'Only Me',
+						value: 'onlyme'
+					}
+				],
+			}
+		]
+	},
+	{
 		name: 'graph',
 		type: 1,
-		description: 'get a graph about a bot',
+		description: 'Get a graph about a bot',
 		options: [
 			{
 				name: 'id',
