@@ -156,7 +156,7 @@ async function managePlayer(client: any, interaction: CommandInteraction | Butto
 		else if (interaction?.member?.voice?.channel?.id != player?.voiceChannel) return interaction.editReply({ content: `You must be in the same voice channel as the bot to use this button!`, ephemeral: true }).catch(() => null);
 		else {
 			interaction?.editReply({
-				content: action == `volume` ? `Volume set to ${volume}%` : action == `pause` ? `Paused / resumed the music!` : action == `shuffle` ? `Shuffled the queue!` : action == `previous` ? `Playing the previous song, if any!` : action == `stop` ? `Stopped the music!` : action == `loop` ? `Looped the queue!` : action == `skip` ? `Skipped the current song!` : action == `queue` ? `Here is the queue!` : `An error occured!`,
+				content: action == `volume` ? `Volume set to ${volume}%` : action == `pause` ? `Paused / resumed the music!` : action == `shuffle` ? `Shuffled the queue!` : action == `previous` ? `Playing the previous song, if any!` : action == `stop` ? `Stopped the music!` : action == `loop` ? `Looped the queue!` : action == `skip` ? `Skipped the current song!` : action == `queue` ? `Here is the queue!` : action == `seek` ? `Seeked to ${client.parseTime(volume, true)}.` : `Some internal action error type occured!`,
 			}).catch(() => null);
 			
 			manageMusic(client, interaction, player, action, action == `seek` ? client.parseTime(volume) : volume);

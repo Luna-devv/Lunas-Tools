@@ -103,9 +103,9 @@ client.parseTime = (time: string, reversed?: boolean) => {
 		const timeArray: string[] = time.split(" "); let ms: number = 0;
 
 		timeArray.forEach((t: string) => {
-			if (t.endsWith("s")) ms += parseInt(t.slice(0, -1)) * 1000;
-			else if (t.endsWith("m")) ms += parseInt(t.slice(0, -1)) * 60000;
-			else if (t.endsWith("h")) ms += parseInt(t.slice(0, -1)) * 3600000;
+			if (t.endsWith("s" || t.endsWith("c"))) ms += parseInt(t.slice(0, -1)) * 1000;
+			else if (t.endsWith("m") || t.endsWith("n")) ms += parseInt(t.slice(0, -1)) * 60000;
+			else if (t.endsWith("h") || t.endsWith("s")) ms += parseInt(t.slice(0, -1)) * 3600000;
 			else if (t.includes(":")) {
 				const timeArray2: string[] = t.split(":");
 				if (timeArray2.length == 2) ms += parseInt(timeArray2[0]) * 60000 + parseInt(timeArray2[1]) * 1000;

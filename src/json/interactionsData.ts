@@ -89,7 +89,7 @@ export default [
 					{
 						name: 'time',
 						type: 3,
-						description: 'The time in seconds or minutes or hours lol',
+						description: 'The time in seconds or minutes or hours lol (ei. 1m 30s)',
 						required: true
 					}
 				]
