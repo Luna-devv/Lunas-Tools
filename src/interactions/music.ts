@@ -1,6 +1,5 @@
-import { volumeSet, pauseSong, skipSong, previousSong, loopToggle, shuffleToggle, queue, volumeSong } from '../modules/music';
-import { VoiceBasedChannel } from 'discord.js';
-import { findPlatforms } from '../modules/music';
+import { ButtonInteraction, CommandInteraction, ContextMenuCommandInteraction, VoiceBasedChannel } from 'discord.js';
+import { findPlatforms, manageMusic } from '../modules/music';
 
 export default {
 	name: 'music',
@@ -45,245 +44,40 @@ export default {
             if (!click) {
 				interaction?.editReply({
 					components: data?.success ? [{ type: 1, components: data.buttons }, { type: 1, components: [{ type: 2, style: 4, label: `Play in Voice Channel`, emoji: `<:icons_play:861852632800952320>`, custom_id: `play_song`, disabled: true }] }] : []
-				});
+				}).catch(() => null);
 			} else {
 				interaction?.editReply({
 					components: data?.success ? [{ type: 1, components: data.buttons }, { type: 1, components: [{ type: 2, style: 4, label: `Currently Playing`, emoji: `<:icons_play:861852632800952320>`, custom_id: `play_song`, disabled: true }] }] : []
-				});
+				}).catch(() => null);
 				
-				await playSong(interaction, client, data, click, true);
+				await playSong(interaction, client, data, click);
 			};
 			
 			await click?.deferUpdate().catch(() => null);
 
 			//@ts-ignore
-		} else if (interaction?.options?.getSubcommand() == `play`) {
-			let voiceChannel: VoiceBasedChannel = (interaction as any)?.member?.voice?.channel, permsCheck: boolean = false;
-			if (voiceChannel) permsCheck = (interaction as any)?.guild?.members?.me?.permissionsIn(voiceChannel?.id)?.has(['Connect', 'Speak']);
-
-			if (!voiceChannel) {
-				interaction.editReply({
-					content: `You need to be in a voice channel to use this button!`,
-				});
-			} else if (!permsCheck) {
-				interaction.editReply({
-					content: `I need to have \`Connect\` and \`Speak\` permissions in your voice channel to use this button!`,
-				});
-			} else {
-				interaction?.editReply({
-					content: `You can dismiss this message now!`,
-				});
-
-				//@ts-ignore
-				await playSong(interaction, client, { raw: interaction?.options?.getString(`search`) }, null, false);
-			};
-
-			//@ts-ignore
-		} else if (interaction?.options?.getSubcommand() == `skip`) {
-			let voiceChannel: VoiceBasedChannel = (interaction as any)?.member?.voice?.channel;
-
-			if (!voiceChannel) {
-				interaction.editReply({
-					content: `You need to be in a voice channel to use this button!`,
-				});
-			} else {
-				let player = client.players.list[voiceChannel?.id];
-
-				if (!player) return interaction.editReply({ content: `There is no music playing in this channel!`, ephemeral: true });
-				else if (interaction?.member?.voice?.channel?.id !== player?.voiceChannel) return interaction.reply({ content: `> You must be in the same voice channel as the bot to use this button!`, ephemeral: true });
-				else {
-					interaction?.editReply({
-						content: `Music has been shuffled!`,
-					});
-
-					skipSong(client, interaction, player);
-				};
-			};
-
-			//@ts-ignore
-		} else if (interaction?.options?.getSubcommand() == `previous`) {
-			let voiceChannel: VoiceBasedChannel = (interaction as any)?.member?.voice?.channel;
-
-			if (!voiceChannel) {
-				interaction.editReply({
-					content: `You need to be in a voice channel to use this button!`,
-				});
-			} else {
-				let player = client.players.list[voiceChannel?.id];
-
-				if (!player) return interaction.editReply({ content: `There is no music playing in this channel!`, ephemeral: true });
-				else if (interaction?.member?.voice?.channel?.id !== player?.voiceChannel) return interaction.reply({ content: `> You must be in the same voice channel as the bot to use this button!`, ephemeral: true });
-				else {
-					interaction?.editReply({
-						content: `Music has been shuffled!`,
-					});
-
-					previousSong(client, interaction, player);
-				};
-			};
-
-			//@ts-ignore
-		} else if (interaction?.options?.getSubcommand() == `queue`) {
-			let voiceChannel: VoiceBasedChannel = (interaction as any)?.member?.voice?.channel;
-
-			if (!voiceChannel) {
-				interaction.editReply({
-					content: `You need to be in a voice channel to use this button!`,
-				});
-			} else {
-				let player = client.players.list[voiceChannel?.id];
-
-				if (!player) return interaction.editReply({ content: `There is no music playing in this channel!`, ephemeral: true });
-				else if (interaction?.member?.voice?.channel?.id !== player?.voiceChannel) return interaction.reply({ content: `> You must be in the same voice channel as the bot to use this button!`, ephemeral: true });
-				else {
-					queue(client, interaction, player);
-				};
-			};
-
-			//@ts-ignore
-		} else if (interaction?.options?.getSubcommand() == `loop`) {
-			let voiceChannel: VoiceBasedChannel = (interaction as any)?.member?.voice?.channel;
-
-			if (!voiceChannel) {
-				interaction.editReply({
-					content: `You need to be in a voice channel to use this button!`,
-				});
-			} else {
-				let player = client.players.list[voiceChannel?.id];
-
-				if (!player) return interaction.editReply({ content: `There is no music playing in this channel!`, ephemeral: true });
-				else if (interaction?.member?.voice?.channel?.id !== player?.voiceChannel) return interaction.reply({ content: `> You must be in the same voice channel as the bot to use this button!`, ephemeral: true });
-				else {
-					interaction?.editReply({
-						content: `Looping is now ${player?.loop ? `enabled` : `disabled`}!`,
-					});
-
-					loopToggle(client, interaction, player);
-				};
-			};
-
-			//@ts-ignore
-		} else if (interaction?.options?.getSubcommand() == `shuffle`) {
-			let voiceChannel: VoiceBasedChannel = (interaction as any)?.member?.voice?.channel;
-
-			if (!voiceChannel) {
-				interaction.editReply({
-					content: `You need to be in a voice channel to use this button!`,
-				});
-			} else {
-				let player = client.players.list[voiceChannel?.id];
-
-				if (!player) return interaction.editReply({ content: `There is no music playing in this channel!`, ephemeral: true });
-				else if (interaction?.member?.voice?.channel?.id !== player?.voiceChannel) return interaction.reply({ content: `> You must be in the same voice channel as the bot to use this button!`, ephemeral: true });
-				else {
-					interaction?.editReply({
-						content: `Music has been shuffled!`,
-					});
-
-					shuffleToggle(client, interaction, player);
-				};
-			};
-
-			//@ts-ignore
-		} else if (interaction?.options?.getSubcommand() == `resume`) {
-			let voiceChannel: VoiceBasedChannel = (interaction as any)?.member?.voice?.channel;
-
-			if (!voiceChannel) {
-				interaction.editReply({
-					content: `You need to be in a voice channel to use this button!`,
-				});
-			} else {
-				let player = client.players.list[voiceChannel?.id];
-
-				if (!player) return interaction.editReply({ content: `There is no music playing in this channel!`, ephemeral: true });
-				else if (interaction?.member?.voice?.channel?.id !== player?.voiceChannel) return interaction.reply({ content: `> You must be in the same voice channel as the bot to use this button!`, ephemeral: true });
-				else {
-					interaction?.editReply({
-						content: `Music has been resumed / paused!`,
-					});
-
-					pauseSong(client, interaction, player);
-				};
-			};
-
-			//@ts-ignore
-		} else if (interaction?.options?.getSubcommand() == `pause`) {
-			let voiceChannel: VoiceBasedChannel = (interaction as any)?.member?.voice?.channel;
-
-			if (!voiceChannel) {
-				interaction.editReply({
-					content: `You need to be in a voice channel to use this button!`,
-				});
-			} else {
-				let player = client.players.list[voiceChannel?.id];
-
-				if (!player) return interaction.editReply({ content: `There is no music playing in this channel!`, ephemeral: true });
-				else if (interaction?.member?.voice?.channel?.id !== player?.voiceChannel) return interaction.reply({ content: `> You must be in the same voice channel as the bot to use this button!`, ephemeral: true });
-				else {
-					interaction?.editReply({
-						content: `Music has been resumed / paused!`,
-					});
-
-					pauseSong(client, interaction, player);
-				};
-			};
-
-			//@ts-ignore
-		} else if (interaction?.options?.getSubcommand() == `stop`) {
-			let voiceChannel: VoiceBasedChannel = (interaction as any)?.member?.voice?.channel;
-
-			if (!voiceChannel) {
-				interaction.editReply({
-					content: `You need to be in a voice channel to use this button!`,
-				});
-			} else {
-				let player = client.players.list[voiceChannel?.id];
-
-				if (!player) return interaction.editReply({ content: `There is no music playing in this channel!`, ephemeral: true });
-				else if (interaction?.member?.voice?.channel?.id !== player?.voiceChannel) return interaction.reply({ content: `> You must be in the same voice channel as the bot to use this button!`, ephemeral: true });
-				else {
-					interaction?.editReply({
-						content: `Music has been stopped!`,
-					});
-
-					player.destroy();
-				};
-			};
-
-			//@ts-ignore
-		} else if (interaction?.options?.getSubcommand() == `volume`) {
-			let voiceChannel: VoiceBasedChannel = (interaction as any)?.member?.voice?.channel;
-
-			if (!voiceChannel) {
-				interaction.editReply({
-					content: `You need to be in a voice channel to use this button!`,
-				});
-			} else {
-				let player = client.players.list[voiceChannel?.id];
-
-				if (!player) return interaction.editReply({ content: `There is no music playing in this channel!`, ephemeral: true });
-				else if (interaction?.member?.voice?.channel?.id !== player?.voiceChannel) return interaction.reply({ content: `> You must be in the same voice channel as the bot to use this button!`, ephemeral: true });
-				else {
-					interaction?.editReply({
-						content: `Volume has been changed!`,
-					});
-
-					volumeSong(client, interaction, player, interaction?.options?.getNumber(`volume`));
-				};
-			};
-
-			//@ts-ignore
-		};
+		} else if (interaction?.options?.getSubcommand() == `play`) managePlayer(client, interaction, `play`);
+		else if (interaction?.options?.getSubcommand() == `queue`) managePlayer(client, interaction, `queue`);
+		else if (interaction?.options?.getSubcommand() == `loop`) managePlayer(client, interaction, `loop`);
+		else if (interaction?.options?.getSubcommand() == `stop`) managePlayer(client, interaction, `stop`);
+		else if (interaction?.options?.getSubcommand() == `pause`) managePlayer(client, interaction, `pause`);
+		else if (interaction?.options?.getSubcommand() == `resume`) managePlayer(client, interaction, `pause`);
+		else if (interaction?.options?.getSubcommand() == `replay`) managePlayer(client, interaction, `replay`);
+		else if (interaction?.options?.getSubcommand() == `shuffle`) managePlayer(client, interaction, `shuffle`);
+		else if (interaction?.options?.getSubcommand() == `previous`) managePlayer(client, interaction, `previous`);
+		else if (interaction?.options?.getSubcommand() == `seek`) managePlayer(client, interaction, `seek`, interaction?.options?.getString(`time`) ?? 0);
+		else if (interaction?.options?.getSubcommand() == `skip`) managePlayer(client, interaction, `skip`, interaction?.options?.getNumber(`position`) ?? 1);
+		else if (interaction?.options?.getSubcommand() == `volume`) managePlayer(client, interaction, `volume`, interaction?.options?.getNumber(`volume`) ?? 70);
 	},
 };
 
-async function playSong(interaction: any, client: any, data: any, click: any, defer: boolean) {
+async function playSong(interaction: any, client: any, data: any, click: any) {
 	let voiceChannelId: string = click?.member?.voice?.channel?.id || interaction?.member?.voice?.channel?.id;
 	let textChannelId: string = click?.channel?.id || interaction?.channel?.id;
-	let message: any; 
+	let message: any, oldMessageId: string = client.players.messages[voiceChannelId]; 
 
-	if (client.players.messages[voiceChannelId]) message = interaction?.channel?.messages?.cache?.get(client.players.messages[voiceChannelId]);
-	if (!message) message = await interaction?.channel?.send({
+	if (oldMessageId) message = interaction?.channel?.messages?.cache?.get(oldMessageId);
+	if (!message?.id) message = await interaction?.channel?.send({
 		content: `Loading Player..`,
 	});
 
@@ -299,6 +93,7 @@ async function playSong(interaction: any, client: any, data: any, click: any, de
 	});
 
 	if (client.players.list[voiceChannelId]?.state != "CONNECTED") await client.players.list[voiceChannelId].connect(); client.players.list[voiceChannelId].setVolume(70);
+	if (!client.players.messages[voiceChannelId]) client.players.messages[voiceChannelId] = message.id;
 
 	switch (res.loadType) {
 		case "NO_MATCHES": {
@@ -310,25 +105,18 @@ async function playSong(interaction: any, client: any, data: any, click: any, de
 		};
 		case "TRACK_LOADED": {
 			client.players.list[voiceChannelId].queue.add(res?.tracks[0]);
-			client.players.messages[voiceChannelId] = message?.id;
-
 			if (!client.players.list[voiceChannelId].playing) await client.players.list[voiceChannelId].play(); break;
 		};
 		case "SEARCH_RESULT": {
 			client.players.list[voiceChannelId].queue.add(res?.tracks[0]);
-			client.players.messages[voiceChannelId] = message?.id;
-
 			if (!client.players.list[voiceChannelId].playing) await client.players.list[voiceChannelId].play(); break;
 		};
 		case "PLAYLIST_LOADED": {
 			client.players.list[voiceChannelId].queue.add(res?.tracks);
-			client.players.messages[voiceChannelId] = message?.id;
-
 			if (!client.players.list[voiceChannelId].playing) await client.players.list[voiceChannelId].play(); break;
 		};
 		case "LOAD_FAILED": {
 			client.players.list[voiceChannelId].destroy();
-			delete client.players.messages[voiceChannelId];
 
 			message.edit({
 				content: `An error while searching occured (load failed)!`,
@@ -338,13 +126,40 @@ async function playSong(interaction: any, client: any, data: any, click: any, de
 		};
 		default: {
 			client.players.list[voiceChannelId].destroy();
-			delete client.players.messages[voiceChannelId];
 
 			message.edit({
 				content: `An internal error occured!`,
 			}).catch(() => null);
 
 			break;
+		};
+	};
+};
+
+async function managePlayer(client: any, interaction: CommandInteraction | ButtonInteraction | ContextMenuCommandInteraction | any, action: (`seek` | `pause` | `skip` | `previous` | `loop` | `shuffle` | `queue` | `volume` | `stop` | `play` | `replay`), volume?: number) {
+	let voiceChannel: VoiceBasedChannel = (interaction as any)?.member?.voice?.channel;
+
+	if (!voiceChannel) {
+		interaction.editReply({
+			content: `You need to be in a voice channel to use this button!`,
+		}).catch(() => null);
+	} else if (action == `play`) {
+		interaction?.editReply({
+			content: `You can now dismiss this message!`,
+		}).catch(() => null);
+
+		playSong(interaction, client, { raw: interaction?.options?.getString(`search`) }, null);
+	} else {
+		let player = client.players.list[voiceChannel?.id];
+
+		if (!player) return interaction.editReply({ content: `There is no music playing in this channel!`, ephemeral: true }).catch(() => null);
+		else if (interaction?.member?.voice?.channel?.id != player?.voiceChannel) return interaction.editReply({ content: `You must be in the same voice channel as the bot to use this button!`, ephemeral: true }).catch(() => null);
+		else {
+			interaction?.editReply({
+				content: action == `volume` ? `Volume set to ${volume}%` : action == `pause` ? `Paused / resumed the music!` : action == `shuffle` ? `Shuffled the queue!` : action == `previous` ? `Playing the previous song, if any!` : action == `stop` ? `Stopped the music!` : action == `loop` ? `Looped the queue!` : action == `skip` ? `Skipped the current song!` : action == `queue` ? `Here is the queue!` : action == `seek` ? `Seeked to ${client.parseTime(volume, true)}.` : `Some internal action error type occured!`,
+			}).catch(() => null);
+			
+			manageMusic(client, interaction, player, action, action == `seek` ? client.parseTime(volume) : volume);
 		};
 	};
 };

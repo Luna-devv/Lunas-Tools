@@ -80,6 +80,7 @@ erelaManager.on(`nodeError`, (node, error) => {
 
 client.players = {
 	list: {},
+	temp: {},
 	messages: {},
 };
 client.config = config;
@@ -97,6 +98,30 @@ client.formatTime = (ms: number, short: boolean) => {
 	if (short) return `${hrs.padStart(2, "0") == "00" ? "" : hrs.padStart(2, "0") + ":"}${min.padStart(2, "0")}:${sec.padStart(2, "0")}`;
 	else return `${hrs.padStart(2, "0") == "00" ? "" : hrs.padStart(2, "0") + " hours "}${min.padStart(2, "0")} minutes and ${sec.padStart(2, "0")} seconds`;
 };
+client.parseTime = (time: string, reversed?: boolean) => {
+	if (!reversed) {
+		const timeArray: string[] = time.split(" "); let ms: number = 0;
+
+		timeArray.forEach((t: string) => {
+			if (t.endsWith("s" || t.endsWith("c"))) ms += parseInt(t.slice(0, -1)) * 1000;
+			else if (t.endsWith("m") || t.endsWith("n")) ms += parseInt(t.slice(0, -1)) * 60000;
+			else if (t.endsWith("h") || t.endsWith("s")) ms += parseInt(t.slice(0, -1)) * 3600000;
+			else if (t.includes(":")) {
+				const timeArray2: string[] = t.split(":");
+				if (timeArray2.length == 2) ms += parseInt(timeArray2[0]) * 60000 + parseInt(timeArray2[1]) * 1000;
+				else if (timeArray2.length == 3) ms += parseInt(timeArray2[0]) * 3600000 + parseInt(timeArray2[1]) * 60000 + parseInt(timeArray2[2]) * 1000;
+			};
+		});
+	return ms;
+	} else {
+		let ms: number = parseInt(time);
+		let timeString: string = ``;
+		if (ms >= 3600000) timeString += `${Math.floor(ms / 3600000)}h `;
+		if (ms >= 60000) timeString += `${Math.floor((ms % 3600000) / 60000)}m `;
+		if (ms >= 1000) timeString += `${Math.floor((ms % 60000) / 1000)}s `;
+		return timeString;
+	};
+};
 
 // ---------------------------------------------------- Handlers
 
@@ -113,12 +138,12 @@ client.login(client.config.token);
 
 // ---------------------------------------------------- Processes
 
-process.on('unhandledRejection', async (error: any) => {
-	console.error(error);
+process.on('uncaughtException', async (error: any) => {
+	console.error(1, typeof error, error); // debug
 });
 
-process.on('uncaughtException', async (error: any) => {
-	console.error(error);
+process.on('unhandledRejection', async (error: any) => {
+	if (!error?.name?.toString()?.includes(`[10008]`)) console.error(2, typeof error, error); // hard debug
 });
 
 // ---------------------------------------------------- End of file

@@ -73,6 +73,26 @@ export default [
 				name: 'skip',
 				type: 1,
 				description: 'Skip the current song',
+				options: [
+					{
+						name: 'position',
+						type: 10,
+						description: 'The position of the song in the queue',
+					}
+				]
+			},
+			{
+				name: 'seek',
+				type: 1,
+				description: 'Seek to a position in the song',
+				options: [
+					{
+						name: 'time',
+						type: 3,
+						description: 'The time in seconds or minutes or hours lol (ei. 1m 30s)',
+						required: true
+					}
+				]
 			},
 			{
 				name: 'previous',
