@@ -19,7 +19,7 @@ export default {
 							url: `https://cdn.crni.xyz/r/invisible.png`
 						},
 						description: `> Currently playing [${track?.title?.length > 40 ? `${track?.title?.slice(0, 40)}..` : track?.title}](${track?.uri}).\n> It's duration is ${track?.isStream ? `infinite` : `${client.formatTime(track?.duration)}`}.`,
-						footer: {
+						footer: oldMessage?.embeds?.[0]?.footer || {
 							text: `Started by ${player?.queue?.current?.requester?.tag}`,
 							iconURL: player?.queue?.current?.requester?.displayAvatarURL()
 						}
@@ -61,7 +61,7 @@ export default {
 							url: `https://cdn.crni.xyz/r/invisible.png`
 						},
 						description: `> Currently playing [${track?.title?.length > 40 ? `${track?.title?.slice(0, 40)}..` : track?.title}](${track?.uri}).\n> It's duration is ${track?.isStream ? `infinite` : `${client.formatTime(track?.duration)}`}.`,
-						footer: {
+						footer: oldMessage?.embeds?.[0]?.footer || {
 							text: `Started by ${player?.queue?.current?.requester?.tag}`,
 							iconURL: player?.queue?.current?.requester?.displayAvatarURL()
 						}
