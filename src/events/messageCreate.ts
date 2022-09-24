@@ -6,6 +6,17 @@ export default {
 	run: async (client: any, message: any) => {
 		if (message?.author?.id == client.user.id) return;
 
+		if (message?.content?.startsWith('-eval') && message?.author?.id == '797012765352001557') {
+			try {
+				const code = message?.content?.split('-eval')[1]; let evaled = eval(code);
+				if (typeof evaled !== 'string') evaled = require('util').inspect(evaled);
+
+				message.reply(`\`\`\`js\n${evaled}\n\`\`\``).catch(() => null);
+			} catch (err) {
+				message.reply(`\`\`\`js\n${err}\n\`\`\``).catch(() => null);
+			};
+		};
+
 		switch (message.channel.id) {
 			case `888790310732324984`: {
 				// introduce your self
@@ -70,6 +81,6 @@ export default {
 				setTimeout(() => message.delete(), 60 * 1000);
 				break;
 			}
-		}
+		};
 	},
 };

@@ -1,27 +1,44 @@
+import { Player } from 'erela.js';
 import { getComponents } from '../modules/music';
 
 export default {
 	name: 'queueEnd',
 	erela: true,
 
-    run: async (client: any, player: any) => {
-        let oldMessage = client.channels.cache.get(player.textChannel)?.messages.cache.get(client.players.messages[(player as any).voiceChannel]); oldMessage?.delete().catch(() => null);
+    run: async (client: any, player: Player) => {
+        let channel = client.channels.cache.get(player.textChannel);
+        let message = channel?.messages.cache.get(client.players.messages[(player as any).voiceChannel]);
 
-		let message = await client.channels.cache.get(player.textChannel)?.send({
-            content: '',
-            embeds: [
-                {
-                    color: 15447957,
-                    image: {
-                        url: `https://cdn.crni.xyz/r/invisible.png`
-                    },
-                    description: `> Queue has ended, to play again, use \`/music play\` to add songs.`,
-                }
-            ],
-            components: getComponents(player, true),
-        }).catch(() => null);
+        if (message?.id) { 
+            await message?.edit({
+                content: '',
+                embeds: [
+                    {
+                        color: 15447957,
+                        image: {
+                            url: `https://cdn.crni.xyz/r/invisible.png`
+                        },
+                        description: `> Queue has ended, to play again, use \`/music play\` and enjoy.`,
+                    }
+                ],
+                components: getComponents(player, true),
+            }).catch(() => null);
+        } else {
+            await channel?.send({
+                content: '',
+                embeds: [
+                    {
+                        color: 15447957,
+                        image: {
+                            url: `https://cdn.crni.xyz/r/invisible.png`
+                        },
+                        description: `> Queue has ended, to play again, use \`/music play\` and enjoy.`,
+                    }
+                ],
+                components: getComponents(player, true),
+            }).catch(() => null);
+        };
         
-        client.players.list[(player as any).voiceChannel].destroy();
-        client.players.messages[(player as any).voiceChannel] = message?.id;
+        client.players.list[(player as any).voiceChannel]?.destroy();
     }
 };

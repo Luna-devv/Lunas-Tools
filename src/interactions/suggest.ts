@@ -33,7 +33,7 @@ export default {
                 message.react('<:cross:1017781065340964934>');
 
                 interaction.editReply({
-                    content: 'Your Suggestion has been successfully submited',
+                    content: 'Your Suggestion has been successfully submited.',
                 });
 
                 break; //end 'write'
@@ -41,7 +41,7 @@ export default {
             case 'manage': {
                 if (!interaction.memberPermissions?.has('Administrator'))
                     return interaction.editReply({
-                        content: 'lol no perms',
+                        content: 'You do not have the required permissions to use this command.',
                     });
 
                 const channel = client.channels.cache.get((client as any).config.suggestions);
@@ -54,7 +54,7 @@ export default {
 
                 if (!message)
                     return interaction.editReply({
-                        content: 'no message lol',
+                        content: 'There is no message with that ID.',
                     });
 
                 if (option === 'delete') return message.delete();
@@ -76,7 +76,7 @@ export default {
                 });
 
                 interaction.editReply({
-                    content: 'done',
+                    content: 'Your Suggestion has been successfully managed.',
                 });
 
                 break; //end 'write'

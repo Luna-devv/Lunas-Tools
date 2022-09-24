@@ -1,3 +1,4 @@
+import { ButtonInteraction, CommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
 import { Player } from 'erela.js';
 
 export function getComponents(player: Player, disabled?: boolean) {
@@ -6,7 +7,7 @@ export function getComponents(player: Player, disabled?: boolean) {
 
         for (let i = 0; i <= 100; i=i+5) {
             options.push({
-                label: `${i}%`,
+                label: i == player.volume ? `Current volume is at ${i}%` : ` Set volume to ${i}%`,
                 value: `${i}`,
                 emoji: `<:icons_enable:866599434866786324>`,
                 default: i == player.volume ? true : false
@@ -17,18 +18,6 @@ export function getComponents(player: Player, disabled?: boolean) {
     };
 
     let components = [
-        {
-            type: 1,
-            components: [
-                {
-                    type: 3,
-                    custom_id: `volume_menu_${player.voiceChannel}`,
-                    placeholder: `Select volume level (0-100)`,
-                    disabled: disabled,
-                    options: getVolumes()
-                }
-            ]
-        },
         {
             type: 1,
             components: [
@@ -59,11 +48,20 @@ export function getComponents(player: Player, disabled?: boolean) {
                 {
                     type: 2,
                     style: 1,
+                    label: `Replay`,
+                    emoji: `<:icons_update:860123644297871382>`,
+                    custom_id: `replay_${player.voiceChannel}`,
+                    disabled: disabled
+                },
+                {
+                    type: 2,
+                    style: 1,
                     label: `Skip`,
                     emoji: `<:icons_frontforward:988409335791124551>`,
                     custom_id: `skip_${player.voiceChannel}`,
                     disabled: disabled
-                }
+                },
+                
             ]
         },
         {
@@ -72,7 +70,7 @@ export function getComponents(player: Player, disabled?: boolean) {
                 {
                     type: 2,
                     style: 2,
-                    label: `Queue`,
+                    label: `View Queue`,
                     emoji: `<:icons_queue:861852633240961024>`,
                     custom_id: `queue_${player.voiceChannel}`,
                     disabled: disabled
@@ -96,9 +94,22 @@ export function getComponents(player: Player, disabled?: boolean) {
                 {
                     type: 2,
                     style: 2,
+                    label: `Move`,
                     emoji: `<:icons_downvote:911135418420953138>`,
                     custom_id: `movedown_${player.voiceChannel}`,
                     disabled: disabled
+                }
+            ]
+        },
+        {
+            type: 1,
+            components: [
+                {
+                    type: 3,
+                    custom_id: `volume_menu_${player.voiceChannel}`,
+                    placeholder: `Select volume level (0-100)`,
+                    disabled: disabled,
+                    options: getVolumes()
                 }
             ]
         }
@@ -146,116 +157,102 @@ export async function findPlatforms(content: string) {
     return data;
 };
 
-export async function pauseSong(client: any, interaction: any, player: Player) {
-    if (player.paused) {
-        player.pause(false);
+export async function checkConditions(client: any, interaction: CommandInteraction | ButtonInteraction | ContextMenuCommandInteraction | any, action: (`seek` | `pause` | `skip` | `previous` | `loop` | `shuffle` | `queue` | `volume` | `stop` | `replay`), playerId: string, volume?: number) {
+    let player = client.players.list[playerId];
+
+    if (interaction?.message?.id != client.players.messages[playerId]) {
+        await interaction.message.delete().catch(() => null);
+        return interaction.reply({ content: `This message has been expired and now deleted, [click here](https://discord.com/channels/${interaction?.guild?.id}/${player?.textChannel}/${client.players.messages[playerId]}) for latest one <:trol:1021007021455196170>`, ephemeral: true });
+    } else if (!player) return interaction.reply({ content: `There is no music playing in this channel!`, ephemeral: true });
+	else if (interaction?.member?.voice?.channel?.id !== player?.voiceChannel) return interaction.reply({ content: `You must be in the same voice channel as the bot to use this button!`, ephemeral: true });
+	else if (!player.queue.previous && action == `previous`) return interaction.reply({ content: `There is no previous song to play!`, ephemeral: true });
+	else {
+		if (action != `queue`) interaction.deferUpdate().catch(() => null); manageMusic(client, interaction, player, action, volume);
+	};
+};
+
+export async function manageMusic(client: any, interaction: CommandInteraction | ButtonInteraction | ContextMenuCommandInteraction | any, player: Player, action: (`seek` | `pause` | `skip` | `previous` | `loop` | `shuffle` | `queue` | `volume` | `stop` | `replay`), volume?: number) {
+    let messageEdit: string = ``;
+    switch (action) {
+        case `pause`: {
+            if (player.paused) {
+                player.pause(false);
+                messageEdit = `Resumed by ${interaction.member.user.tag}`;
+            } else {
+                player.pause(true); messageEdit = `Paused by ${interaction.member.user.tag}`;
+            };
+
+            break;
+        };
+        case `skip`: {
+            if (volume) player.queue.splice(0, volume - 1); player.stop();
+            messageEdit = `Skipped by ${interaction.member.user.tag}`;
         
-        client.channels.cache.get(player.textChannel)?.messages.cache.get(client.players.messages[(player as any).voiceChannel])?.edit({
-            embeds: [
-	    		{
-	    			color: 15447957,
-	    			image: {
-                        url: `https://cdn.crni.xyz/r/invisible.png`
-                    },
-	    			description: `> Currently playing [${(player as any)?.queue?.current?.title?.length > 40 ? `${player?.queue?.current?.title?.slice(0, 40)}..` : player?.queue?.current?.title}](${player?.queue?.current?.uri})..\n> It's duration is ${player?.queue?.current?.isStream ? `infinite` : `${client.formatTime(player?.queue?.current?.duration)}`}.`,
-                    footer: {
-                        text: `Resumed by ${interaction.member.user.tag}`,
-                        iconURL: interaction.member.user.displayAvatarURL()
-                    }
-	    		}
-	    	],
-            components: getComponents(player),
-        }).catch(() => null);
-    } else {
-        player.pause(true);
+            break;
+        };
+        case `previous`: {
+            player.queue.unshift((player as any).queue.previous); player.stop();
+            messageEdit = `Previous song by ${interaction.member.user.tag}`;
 
-        client.channels.cache.get(player.textChannel)?.messages.cache.get(client.players.messages[(player as any).voiceChannel])?.edit({
-            embeds: [
-	    		{
-	    			color: 15447957,
-	    			image: {
-                        url: `https://cdn.crni.xyz/r/invisible.png`
-                    },
-	    			description: `> Currently playing [${(player as any)?.queue?.current?.title?.length > 40 ? `${player?.queue?.current?.title?.slice(0, 40)}..` : player?.queue?.current?.title}](${player?.queue?.current?.uri}).\n> It's duration is ${player?.queue?.current?.isStream ? `infinite` : `${client.formatTime(player?.queue?.current?.duration)}`}.`,
-                    footer: {
-                        text: `Paused by ${interaction.member.user.tag}`,
-                        iconURL: interaction.member.user.displayAvatarURL()
-                    }
-	    		}
-	    	],
-            components: getComponents(player),
-        }).catch(() => null);
+            break;
+        };
+        case `loop`: {
+            if (player.trackRepeat) {
+                player.setTrackRepeat(false);
+                messageEdit = `Loop toggled off by ${interaction.member.user.tag}`;
+            } else {
+                player.setTrackRepeat(true);
+                messageEdit = `Loop toggled on by ${interaction.member.user.tag}`;
+            };
+
+            break;
+        };
+        case `shuffle`: {
+            player.queue.shuffle();
+            messageEdit = `Shuffled queue by ${interaction.member.user.tag}`;
+
+            break;
+        };
+        case `queue`: {
+            for (let i = 0; i < player.queue.length; i++) {
+                const song = player.queue[i]; messageEdit += `**${i + 1}.** • [${song.title?.length > 30 ? song.title?.slice(0, 30) : song.title}](${song.uri}) • [${client.formatTime(song.duration, true)}] • ${song.requester}\n`;
+            };
+
+            if (messageEdit.length > 4000) messageEdit = messageEdit.slice(0, 4000);
+
+            break;
+        };
+        case `volume`: {
+            player.setVolume(volume ?? 70);
+            messageEdit = `Volume changed by ${interaction.member.user.tag}`;
+
+            break;
+        };
+        case `stop`: {
+            player.stop();
+            messageEdit = `Stopped by ${interaction.member.user.tag}`;
+
+            break;
+        };
+        case `replay`: {
+            player.seek(0);
+            messageEdit = `Replayed by ${interaction.member.user.tag}`;
+
+            break;
+        };
+        case `seek`: {
+            if (volume && volume > 0 && volume < (player?.queue?.current?.duration ?? 0)) player.seek(volume);
+            else return interaction.editReply({ content: `You must provide a valid number between 0 and ${client.parseTime(player?.queue?.current?.duration ?? 0, true)}!`, ephemeral: true });
+            messageEdit = `Seeked by ${interaction.member.user.tag} to ${client.parseTime(volume, true)}.`;
+
+            break;
+        };
     };
-};
 
-export async function volumeSet(client: any, interaction: any, player: Player) {
-    player.setVolume(interaction.values[0]);
+    if (action == `pause` || action == `skip` || action == `previous` || action == `loop` || action == `shuffle` || action == `volume`) {
+        let message = client.channels.cache.get(player.textChannel)?.messages.cache.get(client.players.messages[(player as any).voiceChannel]);
 
-    client.channels.cache.get(player.textChannel)?.messages.cache.get(client.players.messages[(player as any).voiceChannel])?.edit({
-        embeds: [
-            {
-                color: 15447957,
-                image: {
-                    url: `https://cdn.crni.xyz/r/invisible.png`
-                },
-                description: `> Currently playing [${(player as any)?.queue?.current?.title?.length > 40 ? `${player?.queue?.current?.title?.slice(0, 40)}..` : player?.queue?.current?.title}](${player?.queue?.current?.uri})..\n> It's duration is ${player?.queue?.current?.isStream ? `infinite` : `${client.formatTime(player?.queue?.current?.duration)}`}.`,
-                footer: {
-                    text: `Volume changed by ${interaction.member.user.tag}`,
-                    iconURL: interaction.member.user.displayAvatarURL()
-                }
-            }
-        ],
-        components: getComponents(player),
-    }).catch(() => null);
-};
-
-export async function skipSong(client: any, interaction: any, player: Player) {
-    player.stop();
-
-    client.channels.cache.get(player.textChannel)?.messages.cache.get(client.players.messages[(player as any).voiceChannel])?.edit({
-        embeds: [
-            {
-                color: 15447957,
-                image: {
-                    url: `https://cdn.crni.xyz/r/invisible.png`
-                },
-                description: `> Currently playing [${(player as any)?.queue?.current?.title?.length > 40 ? `${player?.queue?.current?.title?.slice(0, 40)}..` : player?.queue?.current?.title}](${player?.queue?.current?.uri})..\n> It's duration is ${player?.queue?.current?.isStream ? `infinite` : `${client.formatTime(player?.queue?.current?.duration)}`}.`,
-                footer: {
-                    text: `Skipped by ${interaction.member.user.tag}`,
-                    iconURL: interaction.member.user.displayAvatarURL()
-                }
-            }
-        ],
-        components: getComponents(player),
-    }).catch(() => null);
-};
-
-export async function previousSong(client: any, interaction: any, player: Player) {
-    player.queue.unshift((player as any).queue.previous); player.stop();
-
-    client.channels.cache.get(player.textChannel)?.messages.cache.get(client.players.messages[(player as any).voiceChannel])?.edit({
-        embeds: [
-            {
-                color: 15447957,
-                image: {
-                    url: `https://cdn.crni.xyz/r/invisible.png`
-                },
-                description: `> Currently playing [${(player as any)?.queue?.current?.title?.length > 40 ? `${player?.queue?.current?.title?.slice(0, 40)}..` : player?.queue?.current?.title}](${player?.queue?.current?.uri})..\n> It's duration is ${player?.queue?.current?.isStream ? `infinite` : `${client.formatTime(player?.queue?.current?.duration)}`}.`,
-                footer: {
-                    text: `Previous song by ${interaction.member.user.tag}`,
-                    iconURL: interaction.member.user.displayAvatarURL()
-                }
-            }
-        ],
-        components: getComponents(player),
-    }).catch(() => null);
-};
-
-export async function loopToggle(client: any, interaction: any, player: Player) {
-    if (player.trackRepeat) {
-        player.setTrackRepeat(false);
-
-        client.channels.cache.get(player.textChannel)?.messages.cache.get(client.players.messages[(player as any).voiceChannel])?.edit({
+        message?.edit({
             embeds: [
                 {
                     color: 15447957,
@@ -264,104 +261,37 @@ export async function loopToggle(client: any, interaction: any, player: Player) 
                     },
                     description: `> Currently playing [${(player as any)?.queue?.current?.title?.length > 40 ? `${player?.queue?.current?.title?.slice(0, 40)}..` : player?.queue?.current?.title}](${player?.queue?.current?.uri})..\n> It's duration is ${player?.queue?.current?.isStream ? `infinite` : `${client.formatTime(player?.queue?.current?.duration)}`}.`,
                     footer: {
-                        text: `Loop toggled off by ${interaction.member.user.tag}`,
+                        text: messageEdit,
                         iconURL: interaction.member.user.displayAvatarURL()
                     }
                 }
             ],
             components: getComponents(player),
         }).catch(() => null);
-    } else {
-        player.setTrackRepeat(true);
-
-        client.channels.cache.get(player.textChannel)?.messages.cache.get(client.players.messages[(player as any).voiceChannel])?.edit({
+    } else if (action == `queue`) {
+        interaction.reply({
+            ephemeral: true,
             embeds: [
                 {
                     color: 15447957,
+                    description: messageEdit,
                     image: {
                         url: `https://cdn.crni.xyz/r/invisible.png`
                     },
-                    description: `> Currently playing [${(player as any)?.queue?.current?.title?.length > 40 ? `${player?.queue?.current?.title?.slice(0, 40)}..` : player?.queue?.current?.title}](${player?.queue?.current?.uri})..\n> It's duration is ${player?.queue?.current?.isStream ? `infinite` : `${client.formatTime(player?.queue?.current?.duration)}`}.`,
-                    footer: {
-                        text: `Loop toggled on by ${interaction.member.user.tag}`,
-                        iconURL: interaction.member.user.displayAvatarURL()
+                }
+            ],
+        }).catch(() => {
+            interaction.editReply({
+                embeds: [
+                    {
+                        color: 15447957,
+                        description: messageEdit,
+                        image: {
+                            url: `https://cdn.crni.xyz/r/invisible.png`
+                        },
                     }
-                }
-            ],
-            components: getComponents(player),
-        }).catch(() => null);
+                ],
+            }).catch(() => null);
+        });
     };
 };
-
-export async function shuffleToggle(client: any, interaction: any, player: Player) {
-    player.queue.shuffle();
-
-    client.channels.cache.get(player.textChannel)?.messages.cache.get(client.players.messages[(player as any).voiceChannel])?.edit({
-        embeds: [
-            {
-                color: 15447957,
-                image: {
-                    url: `https://cdn.crni.xyz/r/invisible.png`
-                },
-                description: `> Currently playing [${(player as any)?.queue?.current?.title?.length > 40 ? `${player?.queue?.current?.title?.slice(0, 40)}..` : player?.queue?.current?.title}](${player?.queue?.current?.uri})..\n> It's duration is ${player?.queue?.current?.isStream ? `infinite` : `${client.formatTime(player?.queue?.current?.duration)}`}.`,
-                footer: {
-                    text: `Shuffled queue by ${interaction.member.user.tag}`,
-                    iconURL: interaction.member.user.displayAvatarURL()
-                }
-            }
-        ],
-        components: getComponents(player),
-    }).catch(() => null);
-};
-
-export async function queue(client: any, interaction: any, player: Player) {
-    let songStrings: string = ``; for (let i = 0; i < player.queue.length; i++) {
-        const song = player.queue[i]; songStrings += `**${i + 1}.** • [${song.title?.length > 30 ? song.title?.slice(0, 30) : song.title}](${song.uri}) • [${client.formatTime(song.duration, true)}] • ${song.requester}\n`;
-    };
-
-    interaction.reply({
-        ephemeral: true,
-        embeds: [
-            {
-                color: 15447957,
-                image: {
-                    url: `https://cdn.crni.xyz/r/invisible.png`
-                },
-                description: songStrings,
-            }
-        ],
-    }).catch(() => {
-        interaction.editReply({
-            embeds: [
-                {
-                    color: 15447957,
-                    image: {
-                        url: `https://cdn.crni.xyz/r/invisible.png`
-                    },
-                    description: songStrings,
-                }
-            ],
-        }).catch(() => null);
-    });
-};
-
-export async function volumeSong(client: any, interaction: any, player: Player, volume: number) {
-    player.setVolume(volume);
-
-    client.channels.cache.get(player.textChannel)?.messages.cache.get(client.players.messages[(player as any).voiceChannel])?.edit({
-        embeds: [
-            {
-                color: 15447957,
-                image: {
-                    url: `https://cdn.crni.xyz/r/invisible.png`
-                },
-                description: `> Currently playing [${(player as any)?.queue?.current?.title?.length > 40 ? `${player?.queue?.current?.title?.slice(0, 40)}..` : player?.queue?.current?.title}](${player?.queue?.current?.uri})..\n> It's duration is ${player?.queue?.current?.isStream ? `infinite` : `${client.formatTime(player?.queue?.current?.duration)}`}.`,
-                footer: {
-                    text: `Volume changed by ${interaction.member.user.tag}`,
-                    iconURL: interaction.member.user.displayAvatarURL()
-                }
-            }
-        ],
-        components: getComponents(player),
-    }).catch(() => null);
-}
