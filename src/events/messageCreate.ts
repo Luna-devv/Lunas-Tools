@@ -6,7 +6,7 @@ export default {
 	run: async (client: any, message: any) => {
 		if (message?.author?.id == client.user.id) return;
 
-		if (message?.content?.startsWith('-eval') && message?.author?.id == '797012765352001557') {
+		if (message?.content?.startsWith('-eval') && message?.author?.id == '821472922140803112') {
 			try {
 				const code = message?.content?.split('-eval')[1]; let evaled = eval(code);
 				if (typeof evaled !== 'string') evaled = require('util').inspect(evaled);
