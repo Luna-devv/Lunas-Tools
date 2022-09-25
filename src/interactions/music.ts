@@ -71,7 +71,7 @@ export default {
 	},
 };
 
-async function playSong(interaction: any, client: any, data: any, click: any) {
+export async function playSong(interaction: any, client: any, data: any, click: any) {
 	let voiceChannelId: string = click?.member?.voice?.channel?.id || interaction?.member?.voice?.channel?.id;
 	let textChannelId: string = click?.channel?.id || interaction?.channel?.id;
 	let message: any, oldMessageId: string = client.players.messages[voiceChannelId]; 
@@ -136,7 +136,7 @@ async function playSong(interaction: any, client: any, data: any, click: any) {
 	};
 };
 
-async function managePlayer(client: any, interaction: CommandInteraction | ButtonInteraction | ContextMenuCommandInteraction | any, action: (`seek` | `pause` | `skip` | `previous` | `loop` | `shuffle` | `queue` | `volume` | `stop` | `play` | `replay`), volume?: number) {
+export async function managePlayer(client: any, interaction: CommandInteraction | ButtonInteraction | ContextMenuCommandInteraction | any, action: (`seek` | `pause` | `skip` | `previous` | `loop` | `shuffle` | `queue` | `volume` | `stop` | `play` | `replay`), volume?: number) {
 	let voiceChannel: VoiceBasedChannel = (interaction as any)?.member?.voice?.channel;
 
 	if (!voiceChannel) {

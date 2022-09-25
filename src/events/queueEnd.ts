@@ -18,7 +18,7 @@ export default {
                         image: {
                             url: `https://cdn.crni.xyz/r/invisible.png`
                         },
-                        description: `> Queue has ended, to play again, use \`/music play\` and enjoy.`,
+                        description: `> Queue has ended, use the button below to start playing again.`,
                     }
                 ],
                 components: getComponents(player, true),
@@ -32,7 +32,7 @@ export default {
                         image: {
                             url: `https://cdn.crni.xyz/r/invisible.png`
                         },
-                        description: `> Queue has ended, to play again, use \`/music play\` and enjoy.`,
+                        description: `> Queue has ended, use the button below to start playing again.`,
                     }
                 ],
                 components: getComponents(player, true),
