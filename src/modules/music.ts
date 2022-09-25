@@ -70,7 +70,7 @@ export function getComponents(player: Player, disabled?: boolean) {
                 {
                     type: 2,
                     style: 2,
-                    label: `View Queue`,
+                    label: `View Queue List`,
                     emoji: `<:icons_queue:861852633240961024>`,
                     custom_id: `queue_${player.voiceChannel}`,
                     disabled: disabled
@@ -78,7 +78,7 @@ export function getComponents(player: Player, disabled?: boolean) {
                 {
                     type: 2,
                     style: 2,
-                    label: player?.trackRepeat ? `Loop On` : `Loop Off`,
+                    label: player?.trackRepeat ? `Loop Is On` : `Loop Is Off`,
                     emoji: `<:icons_loop:861852632893227029>`,
                     custom_id: `loop_${player.voiceChannel}`,
                     disabled: disabled
@@ -86,15 +86,28 @@ export function getComponents(player: Player, disabled?: boolean) {
                 {
                     type: 2,
                     style: 2,
-                    label: `Shuffle`,
+                    label: `Shuffle The Queue`,
                     emoji: `<:icons_music:860123644201271326>`,
                     custom_id: `shuffle_${player.voiceChannel}`,
                     disabled: disabled
+                }
+            ]
+        },
+        {
+            type: 1,
+            components: [
+                {
+                    type: 2,
+                    style: 2,
+                    label: `Add New Song To The Queue`,
+                    emoji: `<:icons_enable:866599434866786324>`,
+                    custom_id: `play_${player.voiceChannel}`,
+                    disabled: false
                 },
                 {
                     type: 2,
                     style: 2,
-                    label: `Move`,
+                    label: `Resend This Message`,
                     emoji: `<:icons_downvote:911135418420953138>`,
                     custom_id: `movedown_${player.voiceChannel}`,
                     disabled: disabled
@@ -157,22 +170,25 @@ export async function findPlatforms(content: string) {
     return data;
 };
 
-export async function checkConditions(client: any, interaction: CommandInteraction | ButtonInteraction | ContextMenuCommandInteraction | any, action: (`seek` | `pause` | `skip` | `previous` | `loop` | `shuffle` | `queue` | `volume` | `stop` | `replay`), playerId: string, volume?: number) {
+export async function checkConditions(client: any, interaction: CommandInteraction | ButtonInteraction | ContextMenuCommandInteraction | any, action: (`play` | `seek` | `pause` | `skip` | `previous` | `loop` | `shuffle` | `queue` | `volume` | `stop` | `replay`), playerId: string, volume?: number) {
     let player = client.players.list[playerId];
 
     if (interaction?.message?.id != client.players.messages[playerId]) {
         await interaction.message.delete().catch(() => null);
-        return interaction.reply({ content: `This message has been expired and now deleted, [click here](https://discord.com/channels/${interaction?.guild?.id}/${player?.textChannel}/${client.players.messages[playerId]}) for latest one <:trol:1021007021455196170>`, ephemeral: true });
-    } else if (!player) return interaction.reply({ content: `There is no music playing in this channel!`, ephemeral: true });
-	else if (interaction?.member?.voice?.channel?.id !== player?.voiceChannel) return interaction.reply({ content: `You must be in the same voice channel as the bot to use this button!`, ephemeral: true });
-	else if (!player.queue.previous && action == `previous`) return interaction.reply({ content: `There is no previous song to play!`, ephemeral: true });
-	else {
-		if (action != `queue`) interaction.deferUpdate().catch(() => null); manageMusic(client, interaction, player, action, volume);
+        return interaction.reply({ content: `This message has been expired and now deleted.`, ephemeral: true });
+    } else if (!player) {
+        return interaction.reply({ content: `There is no music playing in this channel!`, ephemeral: true });
+    } else if (interaction?.member?.voice?.channel?.id !== player?.voiceChannel && action != `play` && action != `queue`) {
+        return interaction.reply({ content: `You must be in the same voice channel as the bot to use this button!`, ephemeral: true });
+    } else if (!player.queue.previous && action == `previous`) {
+        return interaction.reply({ content: `There is no previous song to play!`, ephemeral: true });
+    } else {
+		if (action != `queue` && action != `play`) interaction.deferUpdate().catch(() => null); manageMusic(client, interaction, player, action, volume);
 	};
 };
 
-export async function manageMusic(client: any, interaction: CommandInteraction | ButtonInteraction | ContextMenuCommandInteraction | any, player: Player, action: (`seek` | `pause` | `skip` | `previous` | `loop` | `shuffle` | `queue` | `volume` | `stop` | `replay`), volume?: number) {
-    let messageEdit: string = ``;
+export async function manageMusic(client: any, interaction: CommandInteraction | ButtonInteraction | ContextMenuCommandInteraction | any, player: Player, action: (`play` | `seek` | `pause` | `skip` | `previous` | `loop` | `shuffle` | `queue` | `volume` | `stop` | `replay`), volume?: number) {
+    let messageEdit: string = ``, loopEmbeds: { description: string, color: number }[] = [];
     switch (action) {
         case `pause`: {
             if (player.paused) {
@@ -214,11 +230,19 @@ export async function manageMusic(client: any, interaction: CommandInteraction |
             break;
         };
         case `queue`: {
-            for (let i = 0; i < player.queue.length; i++) {
-                const song = player.queue[i]; messageEdit += `**${i + 1}.** • [${song.title?.length > 30 ? song.title?.slice(0, 30) : song.title}](${song.uri}) • [${client.formatTime(song.duration, true)}] • ${song.requester}\n`;
-            };
+            if (player.queue.length < 1) messageEdit = `> There is no music in the queue, add some.`;
+            else {
+                let embed: { description: string, color: number } = { description: ``, color: 15447957 };
+                for (let i = 0; i < player.queue.length; i++) {
+                    let song = player.queue[i]; embed.description += `**${i + 1}.** ${song.title?.length > 30 ? song.title?.slice(0, 30) : song.title?.padEnd(30, ` `)} • [${client.formatTime(song.duration, true)}](${song.uri}) • ${song.requester}\n`;
+                    
+                    if (embed.description.length > 6000) {
+                        loopEmbeds.push(embed); embed = { description: ``, color: 15447957 };
+                    };
+                };
 
-            if (messageEdit.length > 4000) messageEdit = messageEdit.slice(0, 4000);
+                loopEmbeds.push(embed); 
+            };
 
             break;
         };
@@ -229,7 +253,6 @@ export async function manageMusic(client: any, interaction: CommandInteraction |
             break;
         };
         case `stop`: {
-            player.stop();
             messageEdit = `Stopped by ${interaction.member.user.tag}`;
 
             break;
@@ -241,8 +264,9 @@ export async function manageMusic(client: any, interaction: CommandInteraction |
             break;
         };
         case `seek`: {
-            if (volume && volume > 0 && volume < (player?.queue?.current?.duration ?? 0)) player.seek(volume);
-            else return interaction.editReply({ content: `You must provide a valid number between 0 and ${client.parseTime(player?.queue?.current?.duration ?? 0, true)}!`, ephemeral: true });
+            if (!player?.queue?.current?.isSeekable) return interaction.editReply({ content: `This song is not seekable!` });
+            else if (volume && volume > 0 && volume < (player?.queue?.current?.duration ?? 0)) player.seek(volume);
+            else return interaction.editReply({ content: `You must provide a valid number between 0 and ${client.parseTime(player?.queue?.current?.duration ?? 0, true)}!` });
             messageEdit = `Seeked by ${interaction.member.user.tag} to ${client.parseTime(volume, true)}.`;
 
             break;
@@ -252,6 +276,28 @@ export async function manageMusic(client: any, interaction: CommandInteraction |
     if (action == `pause` || action == `skip` || action == `previous` || action == `loop` || action == `shuffle` || action == `volume`) {
         let message = client.channels.cache.get(player.textChannel)?.messages.cache.get(client.players.messages[(player as any).voiceChannel]);
 
+        let feildList: { name: string, value: string, inline: boolean }[] = [{
+			name: `• Currently Playing`,
+			value: `> ${(player as any)?.queue?.current?.title}`,
+			inline: false
+		}, {
+			name: `• Ends`,
+			value: `> ${(player as any)?.queue?.current?.isStream ? `In Far Future` : `<t:${Math.round((new Date().getTime() / 1000) + (175000 / 1000))}:R>`}`,
+			inline: true
+		}, {
+			name: `• Source`,
+			value: `> [Click Here](${(player as any)?.queue?.current?.uri})`,
+			inline: true
+		}];
+
+		// if (player?.queue?.size > 0) {
+		// 	feildList.push({
+		// 		name: `• Next Up`,
+		// 		value: `> ${player?.queue?.[0]?.title}`,
+		// 		inline: false
+		// 	});
+		// ;
+
         message?.edit({
             embeds: [
                 {
@@ -259,39 +305,83 @@ export async function manageMusic(client: any, interaction: CommandInteraction |
                     image: {
                         url: `https://cdn.crni.xyz/r/invisible.png`
                     },
-                    description: `> Currently playing [${(player as any)?.queue?.current?.title?.length > 40 ? `${player?.queue?.current?.title?.slice(0, 40)}..` : player?.queue?.current?.title}](${player?.queue?.current?.uri})..\n> It's duration is ${player?.queue?.current?.isStream ? `infinite` : `${client.formatTime(player?.queue?.current?.duration)}`}.`,
+                    fields: feildList,
                     footer: {
                         text: messageEdit,
-                        iconURL: interaction.member.user.displayAvatarURL()
+                        iconURL: interaction.member.user?.displayAvatarURL()
                     }
                 }
             ],
             components: getComponents(player),
         }).catch(() => null);
     } else if (action == `queue`) {
+
         interaction.reply({
             ephemeral: true,
-            embeds: [
-                {
-                    color: 15447957,
-                    description: messageEdit,
-                    image: {
-                        url: `https://cdn.crni.xyz/r/invisible.png`
-                    },
-                }
-            ],
+            embeds: loopEmbeds,
         }).catch(() => {
             interaction.editReply({
+                embeds: loopEmbeds,
+            }).catch(() => null);
+        });
+    } else if (action == `play`) {
+        interaction.showModal({
+            custom_id: `play_modal_${player?.voiceChannel}`,
+            title: `Play a song!`,
+            components: [{
+                type: 1,
+                   components: [{
+                    custom_id: `song_field`,
+                    label: `Song Name or URL`,
+                    placeholder: `ei. https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
+                    required: true,
+                    style: 2,
+                    type: 4,
+                }],
+            }]
+        });
+    } else if (action == `stop`) {
+        let channel = client.channels.cache.get(player.textChannel);
+        let message = channel?.messages.cache.get(client.players.messages[(player as any).voiceChannel]);
+
+        if (message?.id) { 
+            await message?.edit({
+                content: '',
                 embeds: [
                     {
                         color: 15447957,
-                        description: messageEdit,
                         image: {
                             url: `https://cdn.crni.xyz/r/invisible.png`
                         },
+                        description: `> Use the button below to start playing songs again.`,
+                        footer: {
+                            text: messageEdit,
+                            iconURL: interaction.member.user.displayAvatarURL()
+                        }
                     }
                 ],
+                components: getComponents(player, true),
             }).catch(() => null);
-        });
+        } else {
+            await channel?.send({
+                content: '',
+                embeds: [
+                    {
+                        color: 15447957,
+                        image: {
+                            url: `https://cdn.crni.xyz/r/invisible.png`
+                        },
+                        description: `> Use the button below to start playing songs again.`,
+                        footer: {
+                            text: messageEdit,
+                            iconURL: interaction.member.user.displayAvatarURL()
+                        }
+                    }
+                ],
+                components: getComponents(player, true),
+            }).catch(() => null);
+        };
+        
+        client.players.list[(player as any).voiceChannel]?.destroy();
     };
 };
