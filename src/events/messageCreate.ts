@@ -73,7 +73,7 @@ export default {
 			}
 			case `922927861248167967`: {
 				// votes
-				message.channel.send(`<@!821472922140803112>`).then((m: Message) => m.delete());
+				if (message.embeds[0].description.includes('just voted on Top.gg')) message.channel.send(`<@!821472922140803112>`).then((m: Message) => m.delete());
 				break;
 			}
 			case '917050862742929480': {
