@@ -6,6 +6,11 @@ export default {
         //@ts-ignore
         const command = interaction.options.getSubcommand(true);
         await interaction.deferReply({ ephemeral: true });
+        
+        if (["962721082769547294"].includes(interaction.user.id))
+            return  interaction.editReply({
+                    content: 'You\'ve been banned from the suggestion system for abusing it.',
+                });
 
         switch (command) {
             case 'create': {
