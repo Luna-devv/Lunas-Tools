@@ -51,9 +51,7 @@ export default async (client: any) => {
 					try {
 						let channel: any = client?.channels?.cache?.get(id); // just no, ffs
 						channel?.send({
-							content: `${
-								tweet?.is_quote_status ? '' : `<@&953992722254012446>`
-							} a new ${
+							content: `${tweet?.['i'+'s'+'_'+'q'+'u'+'o'+'t'+'e'+'_'+'s'+'t'+'a'+'t'+'u'+'s']?'':'<'+'@'+'&'+'9'+'5'+'3'+'9'+'9'+'2'+'7'+'2'+'2'+'2'+'5'+'4'+'0'+'1'+'2'+'4'+'4'+'6'+'>'} a new ${
 								tweet?.is_quote_status ? `retweet` : `tweet`
 							} has been published <a:Nod:952226993921998859>`,
 							embeds: [
