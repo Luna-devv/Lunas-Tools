@@ -6,16 +6,18 @@ export default {
         //@ts-ignore
         const command = interaction.options.getSubcommand(true);
         await interaction.deferReply({ ephemeral: true });
-        
+
         if (["962721082769547294"].includes(interaction.user.id))
-            return  interaction.editReply({
-                    content: 'You\'ve been banned from the suggestion system for abusing it.',
-                });
+            return interaction.editReply({
+                content: 'You\'ve been banned from the suggestion system for abusing it.',
+            });
 
         switch (command) {
             case 'create': {
                 //@ts-ignore
                 const suggestion = interaction.options.getString('suggestion');
+
+                await (client.channels.cache.get((client as any).config.suggestions) as TextChannel)?.send('<@&1028637637185114173>');
                 const message = await (client.channels.cache.get((client as any).config.suggestions) as TextChannel)?.send({
                     embeds: [
                         {
