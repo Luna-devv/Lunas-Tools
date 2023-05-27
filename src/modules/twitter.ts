@@ -22,7 +22,7 @@ export default async (client: any) => {
 						type: 2,
 						style: 5,
 						label: `Tweet`,
-						emoji: `<a:c_pridestar:932368163264430120>`,
+						emoji: `<:peepoLove:924058182626721802>`,
 						url: `https://twitter.com/${tweet?.user?.screen_name}/status/${tweet?.id_str}`,
 					},
 				];
@@ -42,46 +42,59 @@ export default async (client: any) => {
 				if (tweet?.text?.startsWith(`RT`))
 					tweet.text = tweet.text?.replace(
 						`RT @${tweet?.retweeted_status?.user?.screen_name}:`,
-						`Retweet from @${tweet?.retweeted_status?.user?.screen_name} :`
+						`Retweet from [@${tweet?.retweeted_status?.user?.screen_name}](https://twitter.com/${tweet.retweeted_status?.user?.screen_name}):`
 					);
 
 				let desc: string | null = await formatDesc(client, tweet?.text); // don't blame me lmao
 
 				client?.config?.twitter?.channels?.forEach((id: any) => {
 					try {
-						let channel: any = client?.channels?.cache?.get(id); // just no, ffs
-						channel?.send({
-							content: `${tweet?.['i'+'s'+'_'+'q'+'u'+'o'+'t'+'e'+'_'+'s'+'t'+'a'+'t'+'u'+'s']?'':'<'+'@'+'&'+'9'+'5'+'3'+'9'+'9'+'2'+'7'+'2'+'2'+'2'+'5'+'4'+'0'+'1'+'2'+'4'+'4'+'6'+'>'} a new ${
-								tweet?.is_quote_status ? `retweet` : `tweet`
-							} has been published <a:Nod:952226993921998859>`,
-							embeds: [
-								{
-									author: {
-										name: `${tweet?.user?.name + ` (@` + tweet?.user?.screen_name + `)`}`,
-										url: `https://twitter.com/${tweet?.user?.screen_name}`,
-										icon_url: tweet?.user?.profile_image_url,
-									},
-									thumbnail: {
-										url: tweet?.user?.profile_image_url?.replaceAll(`normal`, `bigger`),
-									},
-									image: {
-										url: tweet?.entities?.media?.[0]?.media_url_https ?? tweet?.entities?.media?.[0]?.media_url,
-									},
-									color: 13451365,
-									description: desc,
-								},
-							],
+						let channel = client?.channels?.cache?.get(id); // just no, ffs
+
+						// channel?.send({
+						// 	content: `${tweet?.['i' + 's' + '_' + 'q' + 'u' + 'o' + 't' + 'e' + '_' + 's' + 't' + 'a' + 't' + 'u' + 's'] ? '' : '<' + '@' + '&' + '9' + '5' + '3' + '9' + '9' + '2' + '7' + '2' + '2' + '2' + '5' + '4' + '0' + '1' + '2' + '4' + '4' + '6' + '>'} a new ${tweet?.is_quote_status ? `retweet` : `tweet`
+						// 		} has been published <:AnePing:870804582039695440>`,
+						// 	embeds: [
+						// 		{
+						// 			author: {
+						// 				name: `${tweet?.user?.name + ` (@` + tweet?.user?.screen_name + `)`}`,
+						// 				url: `https://twitter.com/${tweet?.user?.screen_name}`,
+						// 				icon_url: tweet?.user?.profile_image_url,
+						// 			},
+						// 			thumbnail: {
+						// 				url: tweet?.user?.profile_image_url?.replaceAll(`normal`, `bigger`),
+						// 			},
+						// 			image: {
+						// 				url: tweet?.entities?.media?.[0]?.media_url_https ?? tweet?.entities?.media?.[0]?.media_url,
+						// 			},
+						// 			color: 13451365,
+						// 			description: desc,
+						// 		},
+						// 	],
+						// 	components: [
+						// 		{
+						// 			type: 1,
+						// 			components: buttons,
+						// 		},
+						// 	],
+						// }).then(() => Logger.log(`Tweet`, `Sent to #${channel?.name}.`, `yellow`));
+						channel.send({
+							content: `${tweet?.['i' + 's' + '_' + 'q' + 'u' + 'o' + 't' + 'e' + '_' + 's' + 't' + 'a' + 't' + 'u' + 's'] ? '' : '<@&1031605863556849714>'} a new ${tweet?.is_quote_status ? 'retweet' : 'tweet'} has been published <a:pinkgirlgifemoji:988478262516801546>\nhttps://fxtwitter.com/${tweet?.user?.screen_name}/status/${tweet?.id_str}`,
 							components: [
 								{
 									type: 1,
 									components: buttons,
 								},
 							],
-						}).then(() => Logger.log(`Tweet`, `Sent to #${channel?.name}.`, `yellow`));
+						})
+
 					} catch (error) {
 						Logger.log(`Tweet`, `Failed to send to #${id}.`, `red`);
 					}
+
+
 				});
+
 			}
 		});
 	});
