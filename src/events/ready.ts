@@ -42,7 +42,7 @@ export default {
 
 
 		(await client.guilds.cache.get('828676951023550495')?.roles.fetch('1099067010031288382'))?.setName(`${new Intl.NumberFormat('en', { notation: 'standard' }).format(await getGuilds(['985213199248924722', '912003493777268767', '1097907896987160666', '857230367350063104']))} guilds`);
-		setTimeout(async () => {
+		setInterval(async () => {
 			(await client.guilds.cache.get('828676951023550495')?.roles.fetch('1099067010031288382'))?.setName(`${new Intl.NumberFormat('en', { notation: 'standard' }).format(await getGuilds(['985213199248924722', '912003493777268767', '1097907896987160666', '857230367350063104']))} guilds`);
 		}, 10_000);
 
